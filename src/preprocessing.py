@@ -51,6 +51,28 @@ class PreprocessingResult:
     categorical_columns: list[str]
 
 
+def get_categorical_columns(df: pd.DataFrame) -> list[str]:
+    """Return categorical/text columns without relying on deprecated dtype aliases.
+
+    This helper is compatible with pandas string, object, and category dtypes and
+    avoids the Pandas4Warning raised by select_dtypes(include=["object", ...])
+    under pandas 3.x.
+    """
+
+    columns: list[str] = []
+
+    for column in df.columns:
+        dtype = df[column].dtype
+        if (
+            isinstance(dtype, pd.CategoricalDtype)
+            or pd.api.types.is_string_dtype(dtype)
+            or pd.api.types.is_object_dtype(dtype)
+        ):
+            columns.append(column)
+
+    return columns
+
+
 def load_dataset(path: str | Path = DEFAULT_DATASET_PATH) -> pd.DataFrame:
     """Load the CSV dataset and validate the minimum required structure."""
 
@@ -80,7 +102,7 @@ def load_dataset(path: str | Path = DEFAULT_DATASET_PATH) -> pd.DataFrame:
 def dataset_overview(df: pd.DataFrame) -> dict[str, object]:
     """Return basic information useful for console output and the report."""
 
-    categorical_columns = df.select_dtypes(include=["object", "category"]).columns.tolist()
+    categorical_columns = get_categorical_columns(df)
     numerical_columns = df.select_dtypes(include=np.number).columns.tolist()
 
     return {
@@ -109,7 +131,7 @@ def handle_missing_values(df: pd.DataFrame) -> pd.DataFrame:
     result = df.copy()
 
     numeric_columns = result.select_dtypes(include=np.number).columns
-    categorical_columns = result.select_dtypes(include=["object", "category"]).columns
+    categorical_columns = get_categorical_columns(result)
 
     for column in numeric_columns:
         if result[column].isna().any():
@@ -284,9 +306,7 @@ def encode_features_and_target(
         raise ValueError("Target Attrition mengandung nilai kosong/tidak dikenali.")
 
     X_raw = df.drop(columns=[TARGET_COLUMN])
-    categorical_columns = X_raw.select_dtypes(
-        include=["object", "category"]
-    ).columns.tolist()
+    categorical_columns = get_categorical_columns(X_raw)
 
     X = pd.get_dummies(
         X_raw,
