@@ -10,6 +10,9 @@ from src.feature_selection import (
     select_features_mi,
     save_mi_selected,
     print_mi_result,
+    select_features_l1,
+    save_l1_selected,
+    print_l1_result,
 )
 
 
@@ -50,6 +53,16 @@ def main():
     for k, v in mi_paths.items():
         print(f"  {k}: {v}")
 
+    # --- 5. L1-based Feature Selection (Ah. Dliya'ul Adlha Jamalul Lail) ---
+    print()
+    X_train_l1, X_test_l1, coef_series, selector = select_features_l1(
+        X_train_scaled, X_test_scaled, y_train
+    )
+    l1_paths = save_l1_selected(X_train_l1, X_test_l1)
+    print_l1_result(X_train_l1, X_test_l1, coef_series)
+    print("\nFile L1 selected disimpan di:")
+    for k, v in l1_paths.items():
+        print(f"  {k}: {v}")
 
 if __name__ == "__main__":
     main()

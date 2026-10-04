@@ -13,7 +13,8 @@ Ruang lingkup:
 from pathlib import Path
 
 import pandas as pd
-from sklearn.feature_selection import mutual_info_classif
+from sklearn.feature_selection import SelectFromModel, mutual_info_classif
+from sklearn.linear_model import LogisticRegression
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
@@ -23,8 +24,10 @@ TARGET = "Attrition"
 SPLIT_OUTPUT_DIR  = Path("data/split")
 SCALED_OUTPUT_DIR = Path("data/scaled")
 MI_OUTPUT_DIR     = Path("data/mi_selected")
+L1_OUTPUT_DIR     = Path("data/l1_selected")
 
-MI_TOP_K = 20  # jumlah fitur terbaik yang dipilih dari Mutual Information
+MI_TOP_K  = 20    # jumlah fitur terbaik yang dipilih dari Mutual Information
+L1_C      = 0.1   # regularisasi L1: semakin kecil C, semakin sedikit fitur yang lolos
 
 RANDOM_STATE = 42
 TEST_SIZE    = 0.2
@@ -224,6 +227,86 @@ def print_mi_result(X_train_mi, X_test_mi, mi_series, k=MI_TOP_K):
 
 
 # ---------------------------------------------------------------------------
+# L1-based Feature Selection
+# ---------------------------------------------------------------------------
+
+def select_features_l1(X_train_scaled, X_test_scaled, y_train,
+                       C=L1_C, random_state=RANDOM_STATE):
+    """Memilih fitur menggunakan L1-regularized Logistic Regression.
+
+    Logistic Regression dengan penalty L1 (solver 'saga') di-fit hanya
+    pada data training. Fitur yang memiliki koefisien bukan nol dipilih
+    oleh SelectFromModel sebagai fitur yang relevan.
+    Nilai C mengontrol kekuatan regularisasi; C kecil → lebih banyak
+    koefisien yang didorong ke nol → lebih sedikit fitur yang dipilih.
+    """
+    estimator = LogisticRegression(
+        penalty="l1",
+        C=C,
+        solver="saga",
+        max_iter=5000,
+        random_state=random_state,
+    )
+
+    selector = SelectFromModel(estimator, prefit=False)
+    selector.fit(X_train_scaled, y_train)
+
+    selected_mask    = selector.get_support()
+    selected_features = X_train_scaled.columns[selected_mask].tolist()
+
+    X_train_l1 = pd.DataFrame(
+        selector.transform(X_train_scaled),
+        columns=selected_features,
+        index=X_train_scaled.index,
+    )
+    X_test_l1 = pd.DataFrame(
+        selector.transform(X_test_scaled),
+        columns=selected_features,
+        index=X_test_scaled.index,
+    )
+
+    coef_series = pd.Series(
+        selector.estimator_.coef_[0],
+        index=X_train_scaled.columns,
+    ).reindex(selected_features).abs().sort_values(ascending=False)
+
+    return X_train_l1, X_test_l1, coef_series, selector
+
+
+def save_l1_selected(X_train_l1, X_test_l1, output_dir=L1_OUTPUT_DIR):
+    """Menyimpan dataset hasil seleksi L1 ke folder data/l1_selected/."""
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    X_train_l1.to_csv(output_dir / "X_train_l1.csv", index=False)
+    X_test_l1.to_csv(output_dir  / "X_test_l1.csv",  index=False)
+
+    return {
+        "X_train_l1": output_dir / "X_train_l1.csv",
+        "X_test_l1":  output_dir / "X_test_l1.csv",
+    }
+
+
+def print_l1_result(X_train_l1, X_test_l1, coef_series):
+    """Menampilkan ringkasan hasil seleksi L1."""
+    print("=" * 70)
+    print("HASIL L1-BASED FEATURE SELECTION - Ah. Dliya'ul Adlha Jamalul Lail")
+    print("=" * 70)
+    print(f"Metode              : Logistic Regression (L1, C={L1_C}, solver=saga)")
+    print(f"Fitur terpilih      : {len(coef_series)} (dari 51 fitur awal)")
+    print(f"Ukuran X_train_l1   : {X_train_l1.shape}")
+    print(f"Ukuran X_test_l1    : {X_test_l1.shape}")
+
+    print("\nFitur terpilih (diurutkan berdasarkan |koefisien|):")
+    coef_df = pd.DataFrame({
+        "fitur":       coef_series.index,
+        "|koefisien|": coef_series.values,
+    }).reset_index(drop=True)
+    coef_df.index += 1
+    print(coef_df.to_string())
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -252,4 +335,14 @@ if __name__ == "__main__":
     print_mi_result(X_train_mi, X_test_mi, mi_series)
     print("\nFile MI selected disimpan di:")
     for k, v in mi_paths.items():
+        print(f"  {k}: {v}")
+
+    print()
+    X_train_l1, X_test_l1, coef_series, selector = select_features_l1(
+        X_train_scaled, X_test_scaled, y_train
+    )
+    l1_paths = save_l1_selected(X_train_l1, X_test_l1)
+    print_l1_result(X_train_l1, X_test_l1, coef_series)
+    print("\nFile L1 selected disimpan di:")
+    for k, v in l1_paths.items():
         print(f"  {k}: {v}")
