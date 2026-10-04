@@ -26,7 +26,7 @@ SCALED_OUTPUT_DIR = Path("data/scaled")
 MI_OUTPUT_DIR     = Path("data/mi_selected")
 L1_OUTPUT_DIR     = Path("data/l1_selected")
 
-# k=20 dipilih berdasarkan distribusi skor MI pada dataset ini:
+# k=20 dipilih berdasarkan distribusi skor MI pada dataset ini
 # fitur rank 1–20 memiliki skor MI >= 0.0067 (masih membawa informasi nyata),
 # sedangkan fitur rank 21 ke bawah skornya turun tajam ke < 0.006
 # dan 7 fitur terakhir (rank 45–51) bernilai 0.000 (nol kontribusi).
@@ -170,7 +170,9 @@ def print_scaling_result(X_train_scaled, X_test_scaled, scaler):
     print("HASIL MIN-MAX SCALING - Ah. Dliya'ul Adlha Jamalul Lail")
     print("=" * 70)
     print(f"Metode              : MinMaxScaler (sklearn)")
-    print(f"Rentang nilai       : [0, 1]")
+    print(f"Rentang nilai       : [0, 1] untuk X_train")
+    print(f"                      (X_test bisa sedikit di luar rentang jika ada nilai")
+    print(f"                       di luar min/max training")
     print(f"Fit pada            : X_train ({X_train_scaled.shape[0]} baris)")
     print(f"Transform pada      : X_train & X_test ({X_test_scaled.shape[0]} baris)")
     print(f"Jumlah fitur        : {X_train_scaled.shape[1]}")
@@ -277,7 +279,7 @@ def select_features_l1(X_train_scaled, X_test_scaled, y_train,
     estimator = LogisticRegression(
         penalty="l1",     # L1 murni: mendorong koefisien tidak relevan ke nol
         C=C,
-        solver="saga",    # satu-satunya solver sklearn yang mendukung penalty L1
+        solver="saga",
         max_iter=5000,
         random_state=random_state,
     )
