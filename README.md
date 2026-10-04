@@ -46,15 +46,28 @@ Output preprocessing tersedia pada:
 data/employee_attrition_preprocessed.csv
 ```
 
-File tersebut menjadi input siap pakai untuk tahap pembagian data, Min-Max scaling, dan feature selection pada bagian berikutnya.
+### Transformasi & Seleksi Fitur — Ah. Dliya'ul Adlha Jamalul Lail ✅
 
-### Transformasi & Seleksi Fitur — Ah. Dliya'ul Adlha Jamalul Lail ⏳
+Bagian transformasi dan feature selection sudah selesai dan sudah terintegrasi ke `main`.
 
-Dikerjakan pada branch `adlha/feature-selection` dengan input `data/employee_attrition_preprocessed.csv`:
-- split data 80% training dan 20% testing;
-- Min-Max scaling;
-- Mutual Information;
-- L1-based Feature Selection.
+Proses yang dikerjakan:
+- membagi data menjadi **80% training** dan **20% testing** menggunakan `random_state=42` dan stratifikasi target;
+- menerapkan **MinMaxScaler** dengan proses `fit` hanya pada data training untuk menghindari data leakage;
+- menerapkan **Mutual Information** pada data training dan memilih **20 fitur terbaik**;
+- mendeteksi fitur biner/One-Hot Encoding sebagai fitur diskrit pada perhitungan Mutual Information;
+- menerapkan **L1-based Feature Selection** menggunakan Logistic Regression dengan `penalty="l1"`, `solver="saga"`, dan `C=0.1`;
+- menerapkan fitur yang terpilih dari data training ke data testing.
+
+Output tahap ini dibuat saat program dijalankan pada folder:
+
+```text
+data/split/
+data/scaled/
+data/mi_selected/
+data/l1_selected/
+```
+
+File output tersebut dapat diregenerate dari pipeline dan tidak disimpan sebagai artefak utama repository.
 
 ### Modeling & Evaluasi — Abdullah Azzam ⏳
 
@@ -103,17 +116,21 @@ Jalankan program:
 python main.py
 ```
 
-Program akan menjalankan preprocessing dan menghasilkan:
+Saat ini `main.py` menjalankan pipeline sampai tahap feature selection:
 
 ```text
-data/employee_attrition_preprocessed.csv
+Preprocessing
+→ Split 80/20
+→ Min-Max Scaling
+→ Mutual Information
+→ L1-based Feature Selection
 ```
 
-Pipeline akan dilanjutkan setelah bagian transformasi, seleksi fitur, modeling, dan evaluasi diintegrasikan.
+Tahap berikutnya adalah integrasi Decision Tree dan evaluasi model.
 
 ## Branch
 
 - `main` — kode dan hasil yang sudah terintegrasi
 - `falah/preprocessing` — dataset dan preprocessing, **selesai dan sudah masuk `main`**
-- `adlha/feature-selection` — transformasi dan seleksi fitur
+- `adlha/feature-selection` — transformasi dan seleksi fitur, **selesai dan sudah masuk `main`**
 - `azzam/model-evaluation` — modeling dan evaluasi
