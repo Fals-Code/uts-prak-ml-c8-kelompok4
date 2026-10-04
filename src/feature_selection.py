@@ -275,9 +275,9 @@ def select_features_l1(X_train_scaled, X_test_scaled, y_train,
     koefisien yang didorong ke nol → lebih sedikit fitur yang dipilih.
     """
     estimator = LogisticRegression(
-        l1_ratio=1,       # l1_ratio=1 setara penalty L1 (tanpa L2 component)
+        penalty="l1",     # L1 murni: mendorong koefisien tidak relevan ke nol
         C=C,
-        solver="saga",
+        solver="saga",    # satu-satunya solver sklearn yang mendukung penalty L1
         max_iter=5000,
         random_state=random_state,
     )
