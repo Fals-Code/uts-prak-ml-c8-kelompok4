@@ -1,7 +1,10 @@
+from pathlib import Path
+
 import numpy as np
 import pandas as pd
 
 DATA_PATH = "data/WA_Fn-UseC_-HR-Employee-Attrition.csv"
+OUTPUT_PATH = "data/employee_attrition_preprocessed.csv"
 TARGET = "Attrition"
 
 
@@ -128,6 +131,17 @@ def preprocess_data(path=DATA_PATH):
     return X, y, info
 
 
+def save_preprocessed_data(X, y, path=OUTPUT_PATH):
+    output_path = Path(path)
+    output_path.parent.mkdir(parents=True, exist_ok=True)
+
+    df_preprocessed = X.copy()
+    df_preprocessed[TARGET] = y.astype(int).to_numpy()
+    df_preprocessed.to_csv(output_path, index=False)
+
+    return output_path
+
+
 def print_result(X, y, info):
     print("=" * 70)
     print("HASIL PREPROCESSING - KELOMPOK 4 C8")
@@ -153,4 +167,6 @@ def print_result(X, y, info):
 
 if __name__ == "__main__":
     X, y, info = preprocess_data()
+    output_path = save_preprocessed_data(X, y)
     print_result(X, y, info)
+    print(f"\nData hasil preprocessing disimpan di: {output_path}")
