@@ -7,6 +7,9 @@ from src.feature_selection import (
     scale_data,
     save_scaled,
     print_scaling_result,
+    select_features_mi,
+    save_mi_selected,
+    print_mi_result,
 )
 
 
@@ -34,6 +37,17 @@ def main():
     print_scaling_result(X_train_scaled, X_test_scaled, scaler)
     print("\nFile scaled disimpan di:")
     for k, v in scaled_paths.items():
+        print(f"  {k}: {v}")
+
+    # --- 4. Mutual Information (Ah. Dliya'ul Adlha Jamalul Lail) ---
+    print()
+    X_train_mi, X_test_mi, mi_series = select_features_mi(
+        X_train_scaled, X_test_scaled, y_train
+    )
+    mi_paths = save_mi_selected(X_train_mi, X_test_mi)
+    print_mi_result(X_train_mi, X_test_mi, mi_series)
+    print("\nFile MI selected disimpan di:")
+    for k, v in mi_paths.items():
         print(f"  {k}: {v}")
 
 

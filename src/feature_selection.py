@@ -13,6 +13,7 @@ Ruang lingkup:
 from pathlib import Path
 
 import pandas as pd
+from sklearn.feature_selection import mutual_info_classif
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import MinMaxScaler
 
@@ -21,6 +22,9 @@ TARGET = "Attrition"
 
 SPLIT_OUTPUT_DIR  = Path("data/split")
 SCALED_OUTPUT_DIR = Path("data/scaled")
+MI_OUTPUT_DIR     = Path("data/mi_selected")
+
+MI_TOP_K = 20  # jumlah fitur terbaik yang dipilih dari Mutual Information
 
 RANDOM_STATE = 42
 TEST_SIZE    = 0.2
@@ -158,6 +162,68 @@ def print_scaling_result(X_train_scaled, X_test_scaled, scaler):
 
 
 # ---------------------------------------------------------------------------
+# Mutual Information
+# ---------------------------------------------------------------------------
+
+def select_features_mi(X_train_scaled, X_test_scaled, y_train,
+                       k=MI_TOP_K, random_state=RANDOM_STATE):
+    """Memilih k fitur terbaik menggunakan Mutual Information.
+
+    MI dihitung pada X_train_scaled terhadap y_train saja
+    (tidak menyentuh X_test) agar tidak terjadi data leakage.
+    random_state dipakai agar hasil MI reproducible.
+    """
+    mi_scores = mutual_info_classif(
+        X_train_scaled, y_train,
+        discrete_features=False,
+        random_state=random_state,
+    )
+
+    mi_series = pd.Series(mi_scores, index=X_train_scaled.columns)
+    mi_series = mi_series.sort_values(ascending=False)
+
+    top_features = mi_series.head(k).index.tolist()
+
+    X_train_mi = X_train_scaled[top_features]
+    X_test_mi  = X_test_scaled[top_features]
+
+    return X_train_mi, X_test_mi, mi_series
+
+
+def save_mi_selected(X_train_mi, X_test_mi, output_dir=MI_OUTPUT_DIR):
+    """Menyimpan dataset hasil seleksi MI ke folder data/mi_selected/."""
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    X_train_mi.to_csv(output_dir / "X_train_mi.csv", index=False)
+    X_test_mi.to_csv(output_dir  / "X_test_mi.csv",  index=False)
+
+    return {
+        "X_train_mi": output_dir / "X_train_mi.csv",
+        "X_test_mi":  output_dir / "X_test_mi.csv",
+    }
+
+
+def print_mi_result(X_train_mi, X_test_mi, mi_series, k=MI_TOP_K):
+    """Menampilkan ringkasan hasil seleksi Mutual Information."""
+    print("=" * 70)
+    print("HASIL MUTUAL INFORMATION - Ah. Dliya'ul Adlha Jamalul Lail")
+    print("=" * 70)
+    print(f"Total fitur awal    : {len(mi_series)}")
+    print(f"Fitur terpilih (k)  : {k}")
+    print(f"Ukuran X_train_mi   : {X_train_mi.shape}")
+    print(f"Ukuran X_test_mi    : {X_test_mi.shape}")
+
+    print(f"\nRanking skor MI (top {k}):")
+    top_df = pd.DataFrame({
+        "fitur": mi_series.head(k).index,
+        "mi_score": mi_series.head(k).values,
+    }).reset_index(drop=True)
+    top_df.index += 1
+    print(top_df.to_string())
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
@@ -176,4 +242,14 @@ if __name__ == "__main__":
     print_scaling_result(X_train_scaled, X_test_scaled, scaler)
     print("\nFile scaled disimpan di:")
     for k, v in scaled_paths.items():
+        print(f"  {k}: {v}")
+
+    print()
+    X_train_mi, X_test_mi, mi_series = select_features_mi(
+        X_train_scaled, X_test_scaled, y_train
+    )
+    mi_paths = save_mi_selected(X_train_mi, X_test_mi)
+    print_mi_result(X_train_mi, X_test_mi, mi_series)
+    print("\nFile MI selected disimpan di:")
+    for k, v in mi_paths.items():
         print(f"  {k}: {v}")
