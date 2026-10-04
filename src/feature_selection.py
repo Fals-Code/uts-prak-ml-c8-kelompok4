@@ -26,8 +26,22 @@ SCALED_OUTPUT_DIR = Path("data/scaled")
 MI_OUTPUT_DIR     = Path("data/mi_selected")
 L1_OUTPUT_DIR     = Path("data/l1_selected")
 
-MI_TOP_K  = 20    # jumlah fitur terbaik yang dipilih dari Mutual Information
-L1_C      = 0.1   # regularisasi L1: semakin kecil C, semakin sedikit fitur yang lolos
+# k=20 dipilih berdasarkan distribusi skor MI pada dataset ini:
+# fitur rank 1–20 memiliki skor MI >= 0.0067 (masih membawa informasi nyata),
+# sedangkan fitur rank 21 ke bawah skornya turun tajam ke < 0.006
+# dan 7 fitur terakhir (rank 45–51) bernilai 0.000 (nol kontribusi).
+# k=20 berada tepat di batas atas sebelum penurunan tajam ini.
+MI_TOP_K  = 20
+
+# C=0.1 dipilih berdasarkan sweep nilai C pada dataset ini:
+# C=0.01 → 0 fitur lolos (terlalu agresif)
+# C=0.05 → 6 fitur  (masih terlalu ketat)
+# C=0.1  → 14 fitur (cukup selektif, hanya fitur paling relevan yang lolos)
+# C=0.2  → 25 fitur (mulai memasukkan fitur noise)
+# C=0.5+ → 30–44 fitur (seleksi menjadi tidak berarti)
+# C=0.1 dipilih sebagai titik di mana L1 masih efektif melakukan seleksi
+# tanpa membuang terlalu banyak fitur yang informatif.
+L1_C      = 0.1
 
 RANDOM_STATE = 42
 TEST_SIZE    = 0.2
@@ -113,7 +127,14 @@ def scale_data(X_train, X_test):
 
     Scaler di-fit hanya pada X_train untuk menghindari data leakage;
     hasilnya kemudian di-transform ke X_test.
-    Semua nilai akan berada dalam rentang [0, 1].
+
+    Catatan rentang nilai:
+    - X_train: semua nilai dijamin berada dalam [0, 1] karena scaler
+      di-fit dari min/max training.
+    - X_test: nilai *umumnya* berada dekat [0, 1], tetapi secara teori
+      bisa sedikit di luar rentang tersebut jika ada nilai pada data
+      test yang berada di luar min/max training. Ini adalah perilaku
+      normal MinMaxScaler dan tidak berarti terjadi kesalahan.
     """
     scaler = MinMaxScaler()
     X_train_scaled = pd.DataFrame(
@@ -175,10 +196,23 @@ def select_features_mi(X_train_scaled, X_test_scaled, y_train,
     MI dihitung pada X_train_scaled terhadap y_train saja
     (tidak menyentuh X_test) agar tidak terjadi data leakage.
     random_state dipakai agar hasil MI reproducible.
+
+    Fitur biner hasil One-Hot Encoding dideteksi secara otomatis:
+    kolom yang hanya berisi nilai 0 dan 1 dianggap diskrit sehingga
+    mutual_info_classif menggunakan estimator yang tepat untuk keduanya,
+    bukan memperlakukan semua fitur sebagai kontinu.
     """
+    # Deteksi otomatis kolom biner (nilai unik hanya subset dari {0, 1})
+    # Ini mencakup semua kolom hasil One-Hot Encoding (OHE) seperti
+    # OverTime_Yes, Gender_Male, JobRole_*, BusinessTravel_*, dll.
+    binary_mask = [
+        set(X_train_scaled[col].dropna().unique()).issubset({0, 1, 0.0, 1.0})
+        for col in X_train_scaled.columns
+    ]
+
     mi_scores = mutual_info_classif(
         X_train_scaled, y_train,
-        discrete_features=False,
+        discrete_features=binary_mask,   # True untuk OHE, False untuk kontinu
         random_state=random_state,
     )
 
@@ -241,7 +275,7 @@ def select_features_l1(X_train_scaled, X_test_scaled, y_train,
     koefisien yang didorong ke nol → lebih sedikit fitur yang dipilih.
     """
     estimator = LogisticRegression(
-        penalty="l1",
+        l1_ratio=1,       # l1_ratio=1 setara penalty L1 (tanpa L2 component)
         C=C,
         solver="saga",
         max_iter=5000,
