@@ -1,6 +1,6 @@
-# UTS Praktikum Machine Learning — Kelompok 4 C8
+# UTS Praktikum Machine Learning (Kelompok 4 C8)
 
-Project UTS Praktikum Machine Learning 2026 untuk **Soal D** menggunakan dataset **IBM HR Analytics Employee Attrition & Performance**.
+Project ini dibuat untuk UTS Praktikum Machine Learning 2026 pada **Soal D**. Dataset yang digunakan adalah **IBM HR Analytics Employee Attrition & Performance**.
 
 Dataset: https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset  
 Target klasifikasi: `Attrition` (`Yes` / `No`).
@@ -16,19 +16,19 @@ Target klasifikasi: `Attrition` (`Yes` / `No`).
 
 ## Progress Pengerjaan
 
-### Dataset & Preprocessing — Ahmad Mathlaul Falah ✅
+### Dataset & Preprocessing (Ahmad Mathlaul Falah) ✅
 
-Bagian preprocessing sudah selesai dan sudah terintegrasi ke `main`.
+Bagian preprocessing sudah selesai dan sudah masuk ke `main`.
 
-Proses yang dikerjakan:
+Tahap yang dikerjakan:
 - membaca dataset dan menentukan `Attrition` sebagai target;
-- memeriksa missing value dan menyiapkan penanganan median/modus;
-- memeriksa dan menghapus data duplikat;
+- mengecek missing value dan menyiapkan penanganan dengan median atau modus;
+- mengecek dan menghapus data duplikat;
 - menghapus `EmployeeNumber` serta kolom konstan `EmployeeCount`, `Over18`, dan `StandardHours`;
 - mendeteksi dan menangani outlier numerik menggunakan metode IQR dengan capping;
 - mengubah target `Attrition` menjadi 0 dan 1;
 - melakukan One-Hot Encoding pada fitur kategorikal;
-- menyimpan hasil preprocessing sebagai file CSV untuk tahap berikutnya.
+- menyimpan hasil preprocessing ke file CSV agar bisa langsung dipakai pada tahap berikutnya.
 
 Hasil preprocessing:
 - jumlah data: **1.470 baris**;
@@ -40,25 +40,25 @@ Hasil preprocessing:
 - seluruh kolom pada file hasil sudah berbentuk numerik;
 - distribusi target: **1.233 No** dan **237 Yes**.
 
-Output preprocessing tersedia pada:
+Hasil preprocessing tersimpan di:
 
 ```text
 data/employee_attrition_preprocessed.csv
 ```
 
-### Transformasi & Seleksi Fitur — Ah. Dliya'ul Adlha Jamalul Lail ✅
+### Transformasi & Seleksi Fitur (Ah. Dliya'ul Adlha Jamalul Lail) ✅
 
-Bagian transformasi dan feature selection sudah selesai dan sudah terintegrasi ke `main`.
+Bagian transformasi dan feature selection juga sudah selesai dan sudah masuk ke `main`.
 
-Proses yang dikerjakan:
+Tahap yang dikerjakan:
 - membagi data menjadi **80% training** dan **20% testing** menggunakan `random_state=42` dan stratifikasi target;
-- menerapkan **MinMaxScaler** dengan proses `fit` hanya pada data training untuk menghindari data leakage;
+- menerapkan **MinMaxScaler** dengan `fit` hanya pada data training agar tidak terjadi data leakage;
 - menerapkan **Mutual Information** pada data training dan memilih **20 fitur terbaik**;
-- mendeteksi fitur biner/One-Hot Encoding sebagai fitur diskrit pada perhitungan Mutual Information;
+- mengenali fitur biner hasil One-Hot Encoding sebagai fitur diskrit pada perhitungan Mutual Information;
 - menerapkan **L1-based Feature Selection** menggunakan Logistic Regression dengan `penalty="l1"`, `solver="saga"`, dan `C=0.1`;
-- menerapkan fitur yang terpilih dari data training ke data testing.
+- memakai fitur terpilih dari data training untuk data testing.
 
-Output tahap ini dibuat saat program dijalankan pada folder:
+Saat program dijalankan, hasil tahap ini dibuat pada folder:
 
 ```text
 data/split/
@@ -67,11 +67,13 @@ data/mi_selected/
 data/l1_selected/
 ```
 
-File output tersebut dapat diregenerate dari pipeline dan tidak disimpan sebagai artefak utama repository.
+File-file tersebut bisa dibuat ulang dari pipeline, jadi tidak perlu disimpan sebagai artefak utama repository.
 
-### Modeling & Evaluasi — Abdullah Azzam ⏳
+### Modeling & Evaluasi (Abdullah Azzam) ⏳
 
-Dikerjakan pada branch `azzam/model-evaluation`:
+Bagian ini masih dikerjakan pada branch `azzam/model-evaluation`.
+
+Yang dikerjakan:
 - training dan testing Decision Tree;
 - Confusion Matrix;
 - Accuracy, Precision, Recall, dan F1-Score;
@@ -98,25 +100,25 @@ Dikerjakan pada branch `azzam/model-evaluation`:
 
 ## Menjalankan Project
 
-Install dependency:
+Install dependency terlebih dahulu:
 
 ```bash
 pip install -r requirements.txt
 ```
 
-Download dataset asli dari Kaggle dan simpan sebagai:
+Download dataset asli dari Kaggle, lalu simpan dengan nama:
 
 ```text
 data/WA_Fn-UseC_-HR-Employee-Attrition.csv
 ```
 
-Jalankan program:
+Setelah itu jalankan:
 
 ```bash
 python main.py
 ```
 
-Saat ini `main.py` menjalankan pipeline sampai tahap feature selection:
+Untuk saat ini, `main.py` sudah menjalankan pipeline sampai tahap feature selection:
 
 ```text
 Preprocessing
@@ -130,7 +132,7 @@ Tahap berikutnya adalah integrasi Decision Tree dan evaluasi model.
 
 ## Branch
 
-- `main` — kode dan hasil yang sudah terintegrasi
-- `falah/preprocessing` — dataset dan preprocessing, **selesai dan sudah masuk `main`**
-- `adlha/feature-selection` — transformasi dan seleksi fitur, **selesai dan sudah masuk `main`**
-- `azzam/model-evaluation` — modeling dan evaluasi
+- `main` (kode dan hasil yang sudah terintegrasi)
+- `falah/preprocessing` (selesai dan sudah masuk `main`)
+- `adlha/feature-selection` (selesai dan sudah masuk `main`)
+- `azzam/model-evaluation` (modeling dan evaluasi)
