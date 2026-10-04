@@ -27,19 +27,30 @@ Proses yang dikerjakan:
 - menghapus `EmployeeNumber` serta kolom konstan `EmployeeCount`, `Over18`, dan `StandardHours`;
 - mendeteksi dan menangani outlier numerik menggunakan metode IQR dengan capping;
 - mengubah target `Attrition` menjadi 0 dan 1;
-- melakukan One-Hot Encoding pada fitur kategorikal.
+- melakukan One-Hot Encoding pada fitur kategorikal;
+- menyimpan hasil preprocessing sebagai file CSV untuk tahap berikutnya.
 
-Hasil preprocessing saat ini:
+Hasil preprocessing:
 - jumlah data: **1.470 baris**;
 - missing value: **0**;
 - data duplikat: **0**;
 - fitur sebelum encoding: **30**;
 - fitur setelah encoding: **51**;
+- total kolom pada file hasil: **52 kolom** (51 fitur + 1 target);
+- seluruh kolom pada file hasil sudah berbentuk numerik;
 - distribusi target: **1.233 No** dan **237 Yes**.
+
+Output preprocessing tersedia pada:
+
+```text
+data/employee_attrition_preprocessed.csv
+```
+
+File tersebut menjadi input siap pakai untuk tahap pembagian data, Min-Max scaling, dan feature selection pada bagian berikutnya.
 
 ### Transformasi & Seleksi Fitur — Ah. Dliya'ul Adlha Jamalul Lail ⏳
 
-Dikerjakan pada branch `adlha/feature-selection`:
+Dikerjakan pada branch `adlha/feature-selection` dengan input `data/employee_attrition_preprocessed.csv`:
 - split data 80% training dan 20% testing;
 - Min-Max scaling;
 - Mutual Information;
@@ -58,7 +69,8 @@ Dikerjakan pada branch `azzam/model-evaluation`:
 ```text
 .
 ├── data/
-│   └── README.md
+│   ├── README.md
+│   └── employee_attrition_preprocessed.csv
 ├── src/
 │   ├── __init__.py
 │   ├── preprocessing.py
@@ -79,7 +91,7 @@ Install dependency:
 pip install -r requirements.txt
 ```
 
-Download dataset dari Kaggle dan simpan sebagai:
+Download dataset asli dari Kaggle dan simpan sebagai:
 
 ```text
 data/WA_Fn-UseC_-HR-Employee-Attrition.csv
@@ -91,11 +103,17 @@ Jalankan program:
 python main.py
 ```
 
-Saat ini `main.py` menjalankan tahap preprocessing. Pipeline akan dilanjutkan setelah bagian transformasi, seleksi fitur, modeling, dan evaluasi diintegrasikan.
+Program akan menjalankan preprocessing dan menghasilkan:
+
+```text
+data/employee_attrition_preprocessed.csv
+```
+
+Pipeline akan dilanjutkan setelah bagian transformasi, seleksi fitur, modeling, dan evaluasi diintegrasikan.
 
 ## Branch
 
-- `main` — kode yang sudah terintegrasi
+- `main` — kode dan hasil yang sudah terintegrasi
 - `falah/preprocessing` — dataset dan preprocessing, **selesai dan sudah masuk `main`**
 - `adlha/feature-selection` — transformasi dan seleksi fitur
 - `azzam/model-evaluation` — modeling dan evaluasi
