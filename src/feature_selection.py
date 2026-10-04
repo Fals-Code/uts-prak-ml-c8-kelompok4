@@ -14,15 +14,13 @@ from pathlib import Path
 
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import MinMaxScaler
 
 PREPROCESSED_PATH = "data/employee_attrition_preprocessed.csv"
 TARGET = "Attrition"
 
-SPLIT_OUTPUT_DIR = Path("data/split")
-TRAIN_X_PATH = SPLIT_OUTPUT_DIR / "X_train.csv"
-TRAIN_Y_PATH = SPLIT_OUTPUT_DIR / "y_train.csv"
-TEST_X_PATH  = SPLIT_OUTPUT_DIR / "X_test.csv"
-TEST_Y_PATH  = SPLIT_OUTPUT_DIR / "y_test.csv"
+SPLIT_OUTPUT_DIR  = Path("data/split")
+SCALED_OUTPUT_DIR = Path("data/scaled")
 
 RANDOM_STATE = 42
 TEST_SIZE    = 0.2
@@ -100,14 +98,82 @@ def print_split_result(X_train, X_test, y_train, y_test):
 
 
 # ---------------------------------------------------------------------------
+# Min-Max scaling
+# ---------------------------------------------------------------------------
+
+def scale_data(X_train, X_test):
+    """Menerapkan Min-Max scaling pada X_train dan X_test.
+
+    Scaler di-fit hanya pada X_train untuk menghindari data leakage;
+    hasilnya kemudian di-transform ke X_test.
+    Semua nilai akan berada dalam rentang [0, 1].
+    """
+    scaler = MinMaxScaler()
+    X_train_scaled = pd.DataFrame(
+        scaler.fit_transform(X_train),
+        columns=X_train.columns,
+        index=X_train.index,
+    )
+    X_test_scaled = pd.DataFrame(
+        scaler.transform(X_test),
+        columns=X_test.columns,
+        index=X_test.index,
+    )
+    return X_train_scaled, X_test_scaled, scaler
+
+
+def save_scaled(X_train_scaled, X_test_scaled, output_dir=SCALED_OUTPUT_DIR):
+    """Menyimpan hasil scaling ke file CSV di folder data/scaled/."""
+    output_dir = Path(output_dir)
+    output_dir.mkdir(parents=True, exist_ok=True)
+
+    X_train_scaled.to_csv(output_dir / "X_train_scaled.csv", index=False)
+    X_test_scaled.to_csv(output_dir  / "X_test_scaled.csv",  index=False)
+
+    return {
+        "X_train_scaled": output_dir / "X_train_scaled.csv",
+        "X_test_scaled":  output_dir / "X_test_scaled.csv",
+    }
+
+
+def print_scaling_result(X_train_scaled, X_test_scaled, scaler):
+    """Menampilkan ringkasan hasil Min-Max scaling."""
+    print("=" * 70)
+    print("HASIL MIN-MAX SCALING - Ah. Dliya'ul Adlha Jamalul Lail")
+    print("=" * 70)
+    print(f"Metode              : MinMaxScaler (sklearn)")
+    print(f"Rentang nilai       : [0, 1]")
+    print(f"Fit pada            : X_train ({X_train_scaled.shape[0]} baris)")
+    print(f"Transform pada      : X_train & X_test ({X_test_scaled.shape[0]} baris)")
+    print(f"Jumlah fitur        : {X_train_scaled.shape[1]}")
+
+    summary = pd.DataFrame({
+        "min_train":  X_train_scaled.min(),
+        "max_train":  X_train_scaled.max(),
+        "min_test":   X_test_scaled.min(),
+        "max_test":   X_test_scaled.max(),
+    })
+    print("\nSampel statistik fitur setelah scaling (5 fitur pertama):")
+    print(summary.head().to_string())
+
+
+# ---------------------------------------------------------------------------
 # Entry point
 # ---------------------------------------------------------------------------
 
 if __name__ == "__main__":
     X, y = load_preprocessed()
     X_train, X_test, y_train, y_test = split_data(X, y)
-    paths = save_split(X_train, X_test, y_train, y_test)
+    split_paths = save_split(X_train, X_test, y_train, y_test)
     print_split_result(X_train, X_test, y_train, y_test)
     print("\nFile split disimpan di:")
-    for k, v in paths.items():
+    for k, v in split_paths.items():
+        print(f"  {k}: {v}")
+
+    print()
+    X_train_scaled, X_test_scaled, scaler = scale_data(X_train, X_test)
+    scaled_paths = save_scaled(X_train_scaled, X_test_scaled)
+    print_scaling_result(X_train_scaled, X_test_scaled, scaler)
+    print("\nFile scaled disimpan di:")
+    for k, v in scaled_paths.items():
         print(f"  {k}: {v}")

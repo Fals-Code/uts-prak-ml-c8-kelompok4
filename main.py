@@ -4,6 +4,9 @@ from src.feature_selection import (
     split_data,
     save_split,
     print_split_result,
+    scale_data,
+    save_scaled,
+    print_scaling_result,
 )
 
 
@@ -22,6 +25,15 @@ def main():
     print_split_result(X_train, X_test, y_train, y_test)
     print("\nFile split disimpan di:")
     for k, v in split_paths.items():
+        print(f"  {k}: {v}")
+
+    # --- 3. Min-Max scaling (Ah. Dliya'ul Adlha Jamalul Lail) ---
+    print()
+    X_train_scaled, X_test_scaled, scaler = scale_data(X_train, X_test)
+    scaled_paths = save_scaled(X_train_scaled, X_test_scaled)
+    print_scaling_result(X_train_scaled, X_test_scaled, scaler)
+    print("\nFile scaled disimpan di:")
+    for k, v in scaled_paths.items():
         print(f"  {k}: {v}")
 
 
