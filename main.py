@@ -1,12 +1,9 @@
-"""Entry point integrasi UTS Praktikum Machine Learning.
-
-Implementasi tiap tahap dikerjakan pada modul di folder src/ sesuai pembagian task.
-"""
+from src.preprocessing import preprocess_data, print_result
 
 
 def main():
-    print("UTS Praktikum ML - Kelompok 4 C8")
-    print("Baseline project siap. Implementasi modul dikerjakan pada branch masing-masing.")
+    X, y, info = preprocess_data()
+    print_result(X, y, info)
 
 
 if __name__ == "__main__":
