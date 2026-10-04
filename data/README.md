@@ -1,9 +1,9 @@
 # Dataset
 
-Gunakan **IBM HR Analytics Employee Attrition & Performance Dataset** dari Kaggle:
+Dataset yang dipakai pada project ini adalah **IBM HR Analytics Employee Attrition & Performance Dataset** dari Kaggle:
 
 https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset
 
-Simpan file dataset hasil download di folder ini.
+Setelah didownload, simpan file dataset asli di folder `data/`.
 
-File data asli (`.csv`, `.xlsx`, dan `.zip`) sengaja diabaikan oleh Git agar repository tetap ringan dan sumber dataset tetap jelas.
+File data asli seperti `.csv`, `.xlsx`, dan `.zip` tidak disimpan di Git supaya repository tetap ringan. Sumber dataset tetap dicantumkan di sini agar mudah dicek kembali.
