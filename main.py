@@ -14,6 +14,8 @@ from src.feature_selection import (
     save_l1_selected,
     print_l1_result,
 )
+from src.modeling import train_decision_tree, predict_decision_tree
+from src.evaluation import evaluate_model, print_evaluation_result
 
 
 def main():
@@ -63,6 +65,50 @@ def main():
     print("\nFile L1 selected disimpan di:")
     for k, v in l1_paths.items():
         print(f"  {k}: {v}")
+    # --- 6. Decision Tree dengan fitur MI ---
+    print()
+    model_mi = train_decision_tree(X_train_mi, y_train)
+    y_pred_mi = predict_decision_tree(model_mi, X_test_mi)
+
+    # --- 7. Decision Tree dengan fitur L1 ---
+    print()
+    model_l1 = train_decision_tree(X_train_l1, y_train)
+    y_pred_l1 = predict_decision_tree(model_l1, X_test_l1)
+
+    # --- 8. Evaluasi model MI ---
+    result_mi = evaluate_model(y_test, y_pred_mi)
+    print_evaluation_result(result_mi, "Decision Tree + Mutual Information")
+
+    # --- 9. Evaluasi model L1 ---
+    result_l1 = evaluate_model(y_test, y_pred_l1)
+    print_evaluation_result(result_l1, "Decision Tree + L1")
+
+    # --- 10. Perbandingan hasil ---
+    print("\n=== Perbandingan Decision Tree ===")
+
+    print(f"{'Metrik':<15} {'MI':>10} {'L1':>10}")
+    print("-" * 37)
+    print(
+        f"{'Accuracy':<15} "
+        f"{result_mi['accuracy']:>10.4f} "
+        f"{result_l1['accuracy']:>10.4f}"
+    )
+    print(
+        f"{'Precision':<15} "
+        f"{result_mi['precision']:>10.4f} "
+        f"{result_l1['precision']:>10.4f}"
+    )
+    print(
+        f"{'Recall':<15} "
+        f"{result_mi['recall']:>10.4f} "
+        f"{result_l1['recall']:>10.4f}"
+    )
+    print(
+        f"{'F1-Score':<15} "
+        f"{result_mi['f1_score']:>10.4f} "
+        f"{result_l1['f1_score']:>10.4f}"
+    )
+
 
 if __name__ == "__main__":
     main()
