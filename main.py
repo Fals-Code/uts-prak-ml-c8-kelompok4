@@ -65,6 +65,7 @@ def main():
     print("\nFile L1 selected disimpan di:")
     for k, v in l1_paths.items():
         print(f"  {k}: {v}")
+
     # --- 6. Decision Tree dengan fitur MI ---
     print()
     model_mi = train_decision_tree(X_train_mi, y_train)
@@ -85,7 +86,6 @@ def main():
 
     # --- 10. Perbandingan hasil ---
     print("\n=== Perbandingan Decision Tree ===")
-
     print(f"{'Metrik':<15} {'MI':>10} {'L1':>10}")
     print("-" * 37)
     print(
