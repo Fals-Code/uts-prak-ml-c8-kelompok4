@@ -48,7 +48,7 @@ data/employee_attrition_preprocessed.csv
 
 ### Transformasi & Seleksi Fitur (Ah. Dliya'ul Adlha Jamalul Lail) ✅
 
-Bagian transformasi dan feature selection juga sudah selesai dan sudah masuk ke `main`.
+Bagian transformasi dan feature selection sudah selesai dan sudah masuk ke `main`.
 
 Tahap yang dikerjakan:
 - membagi data menjadi **80% training** dan **20% testing** menggunakan `random_state=42` dan stratifikasi target;
@@ -69,15 +69,27 @@ data/l1_selected/
 
 File-file tersebut bisa dibuat ulang dari pipeline, jadi tidak perlu disimpan sebagai artefak utama repository.
 
-### Modeling & Evaluasi (Abdullah Azzam) ⏳
+### Modeling & Evaluasi (Abdullah Azzam) ✅
 
-Bagian ini masih dikerjakan pada branch `azzam/model-evaluation`.
+Bagian modeling dan evaluasi sudah selesai dan sudah masuk ke `main`.
 
-Yang dikerjakan:
-- training dan testing Decision Tree;
-- Confusion Matrix;
-- Accuracy, Precision, Recall, dan F1-Score;
-- perbandingan hasil kedua metode seleksi fitur.
+Tahap yang dikerjakan:
+- melatih Decision Tree menggunakan fitur hasil Mutual Information;
+- melatih Decision Tree menggunakan fitur hasil L1-based Feature Selection;
+- melakukan prediksi pada data testing;
+- menghitung Confusion Matrix, Accuracy, Precision, Recall, dan F1-Score;
+- membandingkan performa kedua model.
+
+Hasil pengujian full pipeline:
+
+| Metrik | Decision Tree + MI | Decision Tree + L1 |
+| --- | ---: | ---: |
+| Accuracy | **0.7823** | 0.7755 |
+| Precision | **0.3607** | 0.3273 |
+| Recall | **0.4681** | 0.3830 |
+| F1-Score | **0.4074** | 0.3529 |
+
+Pada hasil pengujian ini, Decision Tree dengan fitur hasil Mutual Information memberikan nilai yang lebih tinggi pada seluruh metrik dibandingkan Decision Tree dengan fitur hasil L1.
 
 ## Struktur Project
 
@@ -118,7 +130,7 @@ Setelah itu jalankan:
 python main.py
 ```
 
-Untuk saat ini, `main.py` sudah menjalankan pipeline sampai tahap feature selection:
+`main.py` akan menjalankan seluruh pipeline secara berurutan:
 
 ```text
 Preprocessing
@@ -126,13 +138,16 @@ Preprocessing
 → Min-Max Scaling
 → Mutual Information
 → L1-based Feature Selection
+→ Decision Tree
+→ Evaluasi
+→ Perbandingan hasil
 ```
 
-Tahap berikutnya adalah integrasi Decision Tree dan evaluasi model.
+Full pipeline sudah diuji dan berhasil dijalankan sampai tahap evaluasi tanpa error.
 
 ## Branch
 
-- `main` (kode dan hasil yang sudah terintegrasi)
+- `main` (kode final yang sudah terintegrasi)
 - `falah/preprocessing` (selesai dan sudah masuk `main`)
 - `adlha/feature-selection` (selesai dan sudah masuk `main`)
-- `azzam/model-evaluation` (modeling dan evaluasi)
+- `azzam/model-evaluation` (selesai dan sudah masuk `main`)
