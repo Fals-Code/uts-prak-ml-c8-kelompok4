@@ -17,5 +17,9 @@ data/*.zip
 !data/employee_attrition_preprocessed.csv
 !data/README.md
 
-# Output hasil program
+# Hasil generate pipeline
+data/split/
+data/scaled/
+data/mi_selected/
+data/l1_selected/
 outputs/
