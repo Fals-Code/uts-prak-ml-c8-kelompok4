@@ -1,21 +1,21 @@
-# Praktikum Machine Learning — C8 Kelompok 4
+# Praktikum Machine Learning - C8 Kelompok 4
 
-Repository kerja kelompok Praktikum Machine Learning 2026 dari **UTS → Week 08 → Week 09 → ... → UAS**.
+Repository kerja kelompok Praktikum Machine Learning 2026 dari **UTS  Week 08  Week 09  ...  UAS**.
 
 ## Navigasi
 
 | Periode | Folder | Status |
 | --- | --- | --- |
-| UTS | [UTS](UTS/) | ✅ Selesai |
-| Week 08 | [Week-08](Week-08/) | 🚧 Berjalan |
-| Week 09 | [Week-09](Week-09/) | ⏳ Menunggu soal |
-| Week 10 | [Week-10](Week-10/) | ⏳ Menunggu soal |
-| Week 11 | [Week-11](Week-11/) | ⏳ Menunggu soal |
-| Week 12 | [Week-12](Week-12/) | ⏳ Menunggu soal |
-| Week 13 | [Week-13](Week-13/) | ⏳ Menunggu soal |
-| UAS | [UAS](UAS/) | ⏳ Menunggu soal |
+| UTS | [UTS](UTS/) | ? Selesai |
+| Week 08 | [Week-08](Week-08/) | ?? Berjalan |
+| Week 09 | [Week-09](Week-09/) | ? Menunggu soal |
+| Week 10 | [Week-10](Week-10/) | ? Menunggu soal |
+| Week 11 | [Week-11](Week-11/) | ? Menunggu soal |
+| Week 12 | [Week-12](Week-12/) | ? Menunggu soal |
+| Week 13 | [Week-13](Week-13/) | ? Menunggu soal |
+| UAS | [UAS](UAS/) | ? Menunggu soal |
 
-Week 08 sedang dikerjakan. Week 09–13 dan UAS tetap menunggu soal; requirement dan pembagian tugasnya belum ditentukan.
+Implementasi dan evaluasi model Week 08 sudah tersedia. Validasi runtime Streamlit masih dilakukan. Week 09-13 dan UAS tetap menunggu soal; requirement dan pembagian tugasnya belum ditentukan.
 
 ## Anggota Kelompok
 
@@ -43,7 +43,7 @@ Lihat [README UTS](UTS/README.md) untuk pipeline dan hasil terdahulu.
 
 ## Cara Kerja Kelompok
 
-Alur: **branch anggota → Pull Request → review → main**.
+Alur: **branch anggota  Pull Request  review  main**.
 
 Sebelum mulai, pastikan perubahan lokal sebelumnya sudah disimpan:
 
@@ -69,7 +69,8 @@ Branch Week 08:
 
 - `falah/week-08-naive-bayes`
 - `adlha/week-08-svm`
-- `azzam/week-08-pipeline-ui`
+- `azzam/week-08-pipeline`
+- `azzam/week-08-ui`
 
 Nama branch untuk periode berikutnya baru ditentukan setelah soalnya tersedia.
 
@@ -78,7 +79,7 @@ Contoh commit:
 - `week 08: add naive bayes classifier`
 - `week 08: add svm classifier`
 - `week 08: add data pipeline`
-- `week 08: add model comparison`
+- `week 08: add model comparison and UI`
 
 ## Aturan File
 
@@ -95,3 +96,5 @@ Audit sebelum restrukturisasi pada 17 Oktober 2026 terhadap commit `3661384`:
 `falah/preprocessing`, `adlha/feature-selection`, dan `azzam/model-evaluation` semuanya sudah masuk `main` (0 commit di depan main).
 PR [#1](https://github.com/Fals-Code/uts-prak-ml-c8-kelompok4/pull/1) dan [#2](https://github.com/Fals-Code/uts-prak-ml-c8-kelompok4/pull/2) sudah merged.
 Branch tersebut tidak diperlukan untuk pekerjaan baru dan tetap dipertahankan sebagai referensi.
+
+

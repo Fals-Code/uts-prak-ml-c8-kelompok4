@@ -1,0 +1,31 @@
+{
+  "source": "UTS/data/employee_attrition_preprocessed.csv",
+  "total_rows": 1470,
+  "train_rows": 1176,
+  "test_rows": 294,
+  "initial_features": 51,
+  "selected_features": [
+    "MonthlyIncome",
+    "TotalWorkingYears",
+    "StockOptionLevel",
+    "NumCompaniesWorked",
+    "OverTime_No",
+    "OverTime_Yes",
+    "JobLevel",
+    "YearsWithCurrManager",
+    "YearsInCurrentRole",
+    "Age",
+    "MaritalStatus_Single",
+    "YearsSinceLastPromotion",
+    "JobSatisfaction",
+    "HourlyRate",
+    "JobRole_Sales Representative",
+    "JobRole_Laboratory Technician",
+    "YearsAtCompany",
+    "DailyRate",
+    "JobRole_Research Director",
+    "BusinessTravel_Travel_Frequently"
+  ],
+  "random_state": 42,
+  "test_size": 0.2
+}
