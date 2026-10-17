@@ -1,153 +1,97 @@
-# UTS Praktikum Machine Learning (Kelompok 4 C8)
+# Praktikum Machine Learning — C8 Kelompok 4
 
-Project ini dibuat untuk UTS Praktikum Machine Learning 2026 pada **Soal D**. Dataset yang digunakan adalah **IBM HR Analytics Employee Attrition & Performance**.
+Repository kerja kelompok Praktikum Machine Learning 2026 dari **UTS → Week 08 → Week 09 → ... → UAS**.
 
-Dataset: https://www.kaggle.com/datasets/pavansubhasht/ibm-hr-analytics-attrition-dataset  
-Target klasifikasi: `Attrition` (`Yes` / `No`).
+## Navigasi
 
-## Alur Pengerjaan
+| Periode | Folder | Status |
+| --- | --- | --- |
+| UTS | [UTS](UTS/) | ✅ Implementasi selesai; hasil pengujian sebelumnya terdokumentasi |
+| Week 08 | [Week-08](Week-08/) | ⏳ Menunggu soal |
+| Week 09 | [Week-09](Week-09/) | ⏳ Menunggu soal |
+| Week 10 | [Week-10](Week-10/) | ⏳ Menunggu soal |
+| Week 11 | [Week-11](Week-11/) | ⏳ Menunggu soal |
+| Week 12 | [Week-12](Week-12/) | ⏳ Menunggu soal |
+| Week 13 | [Week-13](Week-13/) | ⏳ Menunggu soal |
+| Week 14 | [Week-14](Week-14/) | ⏳ Menunggu soal |
+| UAS | [UAS](UAS/) | ⏳ Menunggu soal |
 
-1. Preprocessing data
-2. Split data 80% training dan 20% testing
-3. Min-Max scaling
-4. Feature selection menggunakan Mutual Information dan L1-based Feature Selection
-5. Klasifikasi menggunakan Decision Tree
-6. Evaluasi menggunakan Confusion Matrix, Accuracy, Precision, Recall, dan F1-Score
+Setiap periode menyimpan kode, dataset yang diperlukan, dependency, dan petunjuk menjalankannya di folder masing-masing. Folder minggu dan UAS saat ini hanya placeholder.
 
-## Progress Pengerjaan
+## Anggota Kelompok
 
-### Dataset & Preprocessing (Ahmad Mathlaul Falah) ✅
+| Nama | Kontribusi UTS |
+| --- | --- |
+| Ahmad Mathlaul Falah | Dataset dan preprocessing |
+| Ah. Dliya'ul Adlha Jamalul Lail | Transformasi dan seleksi fitur |
+| Abdullah Azzam | Modeling dan evaluasi |
 
-Bagian preprocessing sudah selesai dan sudah masuk ke `main`.
+Nama dan kontribusi merujuk dokumentasi UTS, source code, serta riwayat kontribusi repository. Pembagian tugas mingguan ditentukan saat soal tersedia.
 
-Tahap yang dikerjakan:
-- membaca dataset dan menentukan `Attrition` sebagai target;
-- mengecek missing value dan menyiapkan penanganan dengan median atau modus;
-- mengecek dan menghapus data duplikat;
-- menghapus `EmployeeNumber` serta kolom konstan `EmployeeCount`, `Over18`, dan `StandardHours`;
-- mendeteksi dan menangani outlier numerik menggunakan metode IQR dengan capping;
-- mengubah target `Attrition` menjadi 0 dan 1;
-- melakukan One-Hot Encoding pada fitur kategorikal;
-- menyimpan hasil preprocessing ke file CSV agar bisa langsung dipakai pada tahap berikutnya.
+## Menjalankan UTS
 
-Hasil preprocessing:
-- jumlah data: **1.470 baris**;
-- missing value: **0**;
-- data duplikat: **0**;
-- fitur sebelum encoding: **30**;
-- fitur setelah encoding: **51**;
-- total kolom pada file hasil: **52 kolom** (51 fitur + 1 target);
-- seluruh kolom pada file hasil sudah berbentuk numerik;
-- distribusi target: **1.233 No** dan **237 Yes**.
-
-Hasil preprocessing tersimpan di:
-
-```text
-data/employee_attrition_preprocessed.csv
-```
-
-### Transformasi & Seleksi Fitur (Ah. Dliya'ul Adlha Jamalul Lail) ✅
-
-Bagian transformasi dan feature selection sudah selesai dan sudah masuk ke `main`.
-
-Tahap yang dikerjakan:
-- membagi data menjadi **80% training** dan **20% testing** menggunakan `random_state=42` dan stratifikasi target;
-- menerapkan **MinMaxScaler** dengan `fit` hanya pada data training agar tidak terjadi data leakage;
-- menerapkan **Mutual Information** pada data training dan memilih **20 fitur terbaik**;
-- mengenali fitur biner hasil One-Hot Encoding sebagai fitur diskrit pada perhitungan Mutual Information;
-- menerapkan **L1-based Feature Selection** menggunakan Logistic Regression dengan `penalty="l1"`, `solver="saga"`, dan `C=0.1`;
-- memakai fitur terpilih dari data training untuk data testing.
-
-Saat program dijalankan, hasil tahap ini dibuat pada folder:
-
-```text
-data/split/
-data/scaled/
-data/mi_selected/
-data/l1_selected/
-```
-
-File-file tersebut bisa dibuat ulang dari pipeline, jadi tidak perlu disimpan sebagai artefak utama repository.
-
-### Modeling & Evaluasi (Abdullah Azzam) ✅
-
-Bagian modeling dan evaluasi sudah selesai dan sudah masuk ke `main`.
-
-Tahap yang dikerjakan:
-- melatih Decision Tree menggunakan fitur hasil Mutual Information;
-- melatih Decision Tree menggunakan fitur hasil L1-based Feature Selection;
-- melakukan prediksi pada data testing;
-- menghitung Confusion Matrix, Accuracy, Precision, Recall, dan F1-Score;
-- membandingkan performa kedua model.
-
-Hasil pengujian full pipeline:
-
-| Metrik | Decision Tree + MI | Decision Tree + L1 |
-| --- | ---: | ---: |
-| Accuracy | **0.7823** | 0.7755 |
-| Precision | **0.3607** | 0.3273 |
-| Recall | **0.4681** | 0.3830 |
-| F1-Score | **0.4074** | 0.3529 |
-
-Pada hasil pengujian ini, Decision Tree dengan fitur hasil Mutual Information memberikan nilai yang lebih tinggi pada seluruh metrik dibandingkan Decision Tree dengan fitur hasil L1.
-
-## Struktur Project
-
-```text
-.
-├── data/
-│   ├── README.md
-│   └── employee_attrition_preprocessed.csv
-├── src/
-│   ├── __init__.py
-│   ├── preprocessing.py
-│   ├── feature_selection.py
-│   ├── modeling.py
-│   └── evaluation.py
-├── main.py
-├── requirements.txt
-├── .gitignore
-└── README.md
-```
-
-## Menjalankan Project
-
-Install dependency terlebih dahulu:
+Download dataset sesuai [petunjuk dataset](UTS/data/README.md), lalu dari root repository:
 
 ```bash
+cd UTS
 pip install -r requirements.txt
-```
-
-Download dataset asli dari Kaggle, lalu simpan dengan nama:
-
-```text
-data/WA_Fn-UseC_-HR-Employee-Attrition.csv
-```
-
-Setelah itu jalankan:
-
-```bash
 python main.py
 ```
 
-`main.py` akan menjalankan seluruh pipeline secara berurutan:
+Dataset mentah harus tersedia di `UTS/data/WA_Fn-UseC_-HR-Employee-Attrition.csv`.
+CSV hasil preprocessing yang sudah tersimpan tetap dipertahankan, tetapi tidak menggantikan dataset mentah untuk menjalankan `main.py`.
+Lihat [README UTS](UTS/README.md) untuk pipeline dan hasil terdahulu.
 
-```text
-Preprocessing
-→ Split 80/20
-→ Min-Max Scaling
-→ Mutual Information
-→ L1-based Feature Selection
-→ Decision Tree
-→ Evaluasi
-→ Perbandingan hasil
+## Cara Kerja Kelompok
+
+Alur: **branch anggota → Pull Request → main**.
+
+Sebelum mulai, pastikan perubahan lokal sebelumnya sudah disimpan:
+
+```bash
+git checkout main
+git pull origin main
+git checkout -b falah/week-08-nama-task
 ```
 
-Full pipeline sudah diuji dan berhasil dijalankan sampai tahap evaluasi tanpa error.
+Kerjakan tugas di folder periodenya. Setelah selesai, periksa perubahan dan pastikan tidak ada kredensial atau file sementara yang ikut:
 
-## Branch
+```bash
+git status
+git diff
+git add .
+git commit -m "week 08: deskripsi pekerjaan"
+git push -u origin falah/week-08-nama-task
+```
 
-- `main` (kode final yang sudah terintegrasi)
-- `falah/preprocessing` (selesai dan sudah masuk `main`)
-- `adlha/feature-selection` (selesai dan sudah masuk `main`)
-- `azzam/model-evaluation` (selesai dan sudah masuk `main`)
+Buka Pull Request menuju `main`. Tulis ringkasan perubahan dan cara pengecekannya; minta anggota lain memeriksa sebelum merge. Setelah merge, ambil perubahan terbaru dari `main` sebelum membuat branch berikutnya.
+
+Format branch: `nama/week-08-task`, `nama/week-09-task`, dan seterusnya; untuk UAS: `nama/uas-task`.
+
+Contoh:
+- `falah/week-08-preprocessing`
+- `adlha/week-08-feature-selection`
+- `azzam/week-08-modeling`
+- `falah/uas-task`, `adlha/uas-task`, `azzam/uas-task`
+
+Contoh commit:
+- `week 08: add preprocessing`
+- `week 08: add model training`
+- `week 09: update evaluation`
+- `uas: finalize model`
+
+## Aturan File
+
+- Lengkapi README periode dengan materi, dataset, pembagian tugas, hasil, dan cara menjalankan setelah informasinya tersedia.
+- Simpan dependency yang diperlukan di folder periode terkait.
+- Jangan commit virtual environment, cache Python/notebook, `.env`, atau kredensial.
+- Output UTS yang dapat dibuat ulang diabaikan oleh Git. CSV preprocessing historis tetap disimpan untuk menjaga hasil UTS.
+- Dataset mentah UTS diunduh terpisah sesuai petunjuknya; dataset minggu lain tidak otomatis diabaikan.
+- Jangan mengubah hasil UTS untuk mengerjakan tugas minggu berikutnya.
+
+## Branch UTS Lama
+
+Audit sebelum restrukturisasi pada 17 Oktober 2026 terhadap commit `3661384`:
+`falah/preprocessing`, `adlha/feature-selection`, dan `azzam/model-evaluation` semuanya sudah masuk `main` (0 commit di depan main).
+PR [#1](https://github.com/Fals-Code/uts-prak-ml-c8-kelompok4/pull/1) dan [#2](https://github.com/Fals-Code/uts-prak-ml-c8-kelompok4/pull/2) sudah merged.
+Branch tersebut tidak diperlukan untuk pekerjaan baru dan tetap dipertahankan sebagai referensi.

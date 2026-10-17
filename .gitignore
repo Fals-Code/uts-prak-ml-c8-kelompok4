@@ -1,25 +1,29 @@
-# Python
+# Python dan notebook
 __pycache__/
 *.py[cod]
+.ipynb_checkpoints/
 
 # Virtual environment
 .venv/
 venv/
 
-# IDE
+# Kredensial lokal
+.env
+.env.*
+!.env.example
+
+# Editor dan sistem operasi
 .vscode/
 .idea/
+.DS_Store
+Thumbs.db
 
-# Dataset lokal
-data/*.csv
-data/*.xlsx
-data/*.zip
-!data/employee_attrition_preprocessed.csv
-!data/README.md
+# Dataset mentah UTS diunduh terpisah (lihat UTS/data/README.md)
+/UTS/data/WA_Fn-UseC_-HR-Employee-Attrition.csv
 
-# Hasil generate pipeline
-data/split/
-data/scaled/
-data/mi_selected/
-data/l1_selected/
-outputs/
+# Output UTS yang dapat dibuat ulang
+/UTS/data/split/
+/UTS/data/scaled/
+/UTS/data/mi_selected/
+/UTS/data/l1_selected/
+/UTS/outputs/
