@@ -6,17 +6,16 @@ Repository kerja kelompok Praktikum Machine Learning 2026 dari **UTS → Week 08
 
 | Periode | Folder | Status |
 | --- | --- | --- |
-| UTS | [UTS](UTS/) | ✅ Implementasi selesai; hasil pengujian sebelumnya terdokumentasi |
-| Week 08 | [Week-08](Week-08/) | ⏳ Menunggu soal |
+| UTS | [UTS](UTS/) | ✅ Selesai |
+| Week 08 | [Week-08](Week-08/) | 🚧 Berjalan |
 | Week 09 | [Week-09](Week-09/) | ⏳ Menunggu soal |
 | Week 10 | [Week-10](Week-10/) | ⏳ Menunggu soal |
 | Week 11 | [Week-11](Week-11/) | ⏳ Menunggu soal |
 | Week 12 | [Week-12](Week-12/) | ⏳ Menunggu soal |
 | Week 13 | [Week-13](Week-13/) | ⏳ Menunggu soal |
-| Week 14 | [Week-14](Week-14/) | ⏳ Menunggu soal |
 | UAS | [UAS](UAS/) | ⏳ Menunggu soal |
 
-Setiap periode menyimpan kode, dataset yang diperlukan, dependency, dan petunjuk menjalankannya di folder masing-masing. Folder minggu dan UAS saat ini hanya placeholder.
+Week 08 sedang dikerjakan. Week 09–13 dan UAS tetap menunggu soal; requirement dan pembagian tugasnya belum ditentukan.
 
 ## Anggota Kelompok
 
@@ -26,7 +25,7 @@ Setiap periode menyimpan kode, dataset yang diperlukan, dependency, dan petunjuk
 | Ah. Dliya'ul Adlha Jamalul Lail | Transformasi dan seleksi fitur |
 | Abdullah Azzam | Modeling dan evaluasi |
 
-Nama dan kontribusi merujuk dokumentasi UTS, source code, serta riwayat kontribusi repository. Pembagian tugas mingguan ditentukan saat soal tersedia.
+Nama dan kontribusi merujuk dokumentasi UTS, source code, serta riwayat kontribusi repository. Pembagian Week 08 tersedia pada [README Week 08](Week-08/README.md).
 
 ## Menjalankan UTS
 
@@ -44,14 +43,14 @@ Lihat [README UTS](UTS/README.md) untuk pipeline dan hasil terdahulu.
 
 ## Cara Kerja Kelompok
 
-Alur: **branch anggota → Pull Request → main**.
+Alur: **branch anggota → Pull Request → review → main**.
 
 Sebelum mulai, pastikan perubahan lokal sebelumnya sudah disimpan:
 
 ```bash
 git checkout main
 git pull origin main
-git checkout -b falah/week-08-nama-task
+git checkout -b falah/week-08-naive-bayes
 ```
 
 Kerjakan tugas di folder periodenya. Setelah selesai, periksa perubahan dan pastikan tidak ada kredensial atau file sementara yang ikut:
@@ -61,32 +60,33 @@ git status
 git diff
 git add .
 git commit -m "week 08: deskripsi pekerjaan"
-git push -u origin falah/week-08-nama-task
+git push -u origin falah/week-08-naive-bayes
 ```
 
-Buka Pull Request menuju `main`. Tulis ringkasan perubahan dan cara pengecekannya; minta anggota lain memeriksa sebelum merge. Setelah merge, ambil perubahan terbaru dari `main` sebelum membuat branch berikutnya.
+Buka Pull Request menuju `main`. Tulis ringkasan perubahan dan cara pengecekannya; minta anggota lain melakukan review sebelum merge. Setelah merge, ambil perubahan terbaru dari `main` sebelum membuat branch berikutnya.
 
-Format branch: `nama/week-08-task`, `nama/week-09-task`, dan seterusnya; untuk UAS: `nama/uas-task`.
+Branch Week 08:
 
-Contoh:
-- `falah/week-08-preprocessing`
-- `adlha/week-08-feature-selection`
-- `azzam/week-08-modeling`
-- `falah/uas-task`, `adlha/uas-task`, `azzam/uas-task`
+- `falah/week-08-naive-bayes`
+- `adlha/week-08-svm`
+- `azzam/week-08-pipeline-ui`
+
+Nama branch untuk periode berikutnya baru ditentukan setelah soalnya tersedia.
 
 Contoh commit:
-- `week 08: add preprocessing`
-- `week 08: add model training`
-- `week 09: update evaluation`
-- `uas: finalize model`
+
+- `week 08: add naive bayes classifier`
+- `week 08: add svm classifier`
+- `week 08: add data pipeline`
+- `week 08: add model comparison`
 
 ## Aturan File
 
-- Lengkapi README periode dengan materi, dataset, pembagian tugas, hasil, dan cara menjalankan setelah informasinya tersedia.
+- Lengkapi README periode dengan requirement, pembagian tugas, hasil, dan cara menjalankan setelah informasinya tersedia.
 - Simpan dependency yang diperlukan di folder periode terkait.
 - Jangan commit virtual environment, cache Python/notebook, `.env`, atau kredensial.
 - Output UTS yang dapat dibuat ulang diabaikan oleh Git. CSV preprocessing historis tetap disimpan untuk menjaga hasil UTS.
-- Dataset mentah UTS diunduh terpisah sesuai petunjuknya; dataset minggu lain tidak otomatis diabaikan.
+- Dataset mentah UTS diunduh terpisah sesuai petunjuknya; jangan menggandakan dataset mentah untuk Week 08 tanpa kebutuhan.
 - Jangan mengubah hasil UTS untuk mengerjakan tugas minggu berikutnya.
 
 ## Branch UTS Lama
