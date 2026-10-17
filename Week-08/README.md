@@ -1,149 +1,171 @@
-# Week 08 — Klasifikasi
+# Week 08 - Klasifikasi
 
 ## Status
 
-🚧 Sedang dikerjakan
+?? Implementasi dan evaluasi model selesai. Aplikasi Streamlit sudah tersedia, tetapi startup server belum dapat divalidasi pada environment kerja karena paket Streamlit tidak tersedia dan akses instalasi eksternal dibatasi.
 
-## Tugas
+## Tujuan
 
-1. Tugas dikerjakan secara kelompok sesuai kelompok UTS.
-2. Membuat program klasifikasi menggunakan Naive Bayes.
-3. Membuat program klasifikasi menggunakan SVM.
-4. Menggunakan dataset yang sama dengan UTS.
-5. Mengikuti tahapan pengerjaan UTS.
-6. Membagi data menjadi 80% training dan 20% testing.
-7. Menganalisis hasil Confusion Matrix.
-8. Membandingkan performa Naive Bayes, SVM, dan Decision Tree hasil UTS.
-9. Membuat UI/UX menggunakan Streamlit atau Flask untuk metode dengan accuracy tertinggi.
-10. Membuat laporan berisi screenshot coding, hasil output program, dan penjelasan.
-11. Mengumpulkan file Python dan laporan.
-12. Mengikuti penamaan file pada soal: `Tugas klasifikasi_NIM.Zip`.
+Week 08 membandingkan Naive Bayes, SVM, dan Decision Tree dari UTS pada dataset serta pipeline yang sama. Model dengan accuracy tertinggi digunakan oleh UI prediksi.
 
-Model terbaik belum ditentukan. Pemilihannya harus berdasarkan hasil pengujian aktual seluruh model.
+## Dataset dan Pipeline
 
-## Dataset
+Dataset yang digunakan adalah **IBM HR Analytics Employee Attrition & Performance** dengan target `Attrition`. Implementasi memakai `UTS/data/employee_attrition_preprocessed.csv`, yaitu output preprocessing UTS yang sudah tersimpan. Dataset mentah tidak digandakan ke folder Week 08.
 
-Menggunakan **IBM HR Analytics Employee Attrition & Performance** yang sama dengan UTS, dengan target `Attrition`.
+Tahapan pipeline:
 
-Sumber dan petunjuk dataset tersedia di [dokumentasi dataset UTS](../UTS/data/README.md). Jangan commit dataset mentah duplikat tanpa kebutuhan.
+1. membaca 1.470 baris dan 51 fitur hasil preprocessing UTS;
+2. membagi data secara terstratifikasi menjadi 80% training dan 20% testing dengan `random_state=42`;
+3. melakukan Min-Max scaling, dengan scaler hanya di-fit pada data training;
+4. memilih 20 fitur menggunakan Mutual Information yang dihitung hanya dari data training;
+5. memberikan hasil split dan transformasi yang sama kepada seluruh model.
 
-## Metode
+Hasil split terdiri atas 1.176 baris training dan 294 baris testing. Jalur Mutual Information dipilih agar perbandingan konsisten dengan salah satu konfigurasi utama pada UTS. Decision Tree dijalankan kembali dengan parameter UTS, yaitu `DecisionTreeClassifier(random_state=42)`, pada split yang sama.
 
-- Naive Bayes
-- SVM
-- Decision Tree hasil UTS sebagai pembanding
+## Model dan Parameter
 
-## Split Data
+- Naive Bayes: `GaussianNB()`.
+- SVM: `SVC(kernel="rbf", C=1.0, gamma="scale", random_state=42)`.
+- Decision Tree: konfigurasi UTS tanpa tuning tambahan.
 
-- 80% training
-- 20% testing
+Tidak dilakukan hyperparameter tuning besar karena tidak diminta pada soal.
 
-## Evaluasi
+## Hasil Evaluasi
 
-- Membuat dan menganalisis Confusion Matrix.
-- Menggunakan metrik evaluasi untuk membandingkan model.
-- Menentukan model dengan accuracy tertinggi berdasarkan hasil aktual.
+| Model | Accuracy | Precision | Recall | F1-Score |
+| --- | ---: | ---: | ---: | ---: |
+| Naive Bayes | 0.6565 | 0.2750 | 0.7021 | 0.3952 |
+| SVM | **0.8469** | **0.5833** | 0.1489 | 0.2373 |
+| Decision Tree | 0.7823 | 0.3607 | 0.4681 | **0.4074** |
 
-Nilai evaluasi belum tersedia dan tidak dicantumkan sebelum implementasi serta pengujian selesai.
+Seluruh angka di atas dihasilkan oleh `python main.py` dan tersimpan pada `outputs/metrics.json` serta `outputs/model_comparison.csv`.
 
-## UI
+### Confusion Matrix
 
-Model dengan accuracy tertinggi berdasarkan pengujian aktual akan digunakan pada UI. Soal mengizinkan **Streamlit atau Flask**; pilihan framework belum ditentukan.
+Urutan matriks adalah `[[TN, FP], [FN, TP]]`.
 
-## Pembagian Tugas
+| Model | TN | FP | FN | TP |
+| --- | ---: | ---: | ---: | ---: |
+| Naive Bayes | 160 | 87 | 14 | 33 |
+| SVM | 242 | 5 | 40 | 7 |
+| Decision Tree | 208 | 39 | 25 | 22 |
 
-### Ahmad Mathlaul Falah — Naive Bayes & Evaluasi
+Naive Bayes mengenali 33 dari 47 pegawai yang benar-benar mengalami attrition. Recall-nya paling tinggi, tetapi menghasilkan 87 false positive sehingga precision dan accuracy lebih rendah.
+
+SVM menghasilkan accuracy tertinggi dan hanya lima false positive. Namun, model ini melewatkan 40 kasus attrition sehingga recall kelas `Yes` rendah. Tingginya accuracy perlu dibaca bersama distribusi kelas yang tidak seimbang.
+
+Decision Tree mengenali 22 kasus attrition dengan 39 false positive. Accuracy-nya berada di bawah SVM, tetapi F1-Score-nya paling tinggi karena keseimbangan precision dan recall lebih baik daripada dua model lain.
+
+Sesuai aturan soal, **SVM dipilih untuk UI karena memiliki accuracy tertinggi, yaitu 0.8469**.
+
+## Struktur Project
+
+```text
+Week-08/
+��� README.md
+��� requirements.txt
+��� main.py
+��� app.py
+��� src/
+�   ��� data_pipeline.py
+�   ��� naive_bayes.py
+�   ��� svm_model.py
+�   ��� evaluation.py
+�   ��� comparison.py
+��� tests/
+�   ��� test_week08.py
+��� outputs/
+��� docs/
+    ��� assets/
+```
+
+## Instalasi
+
+Dari root repository:
+
+```bash
+python -m venv .venv
+```
+
+Aktifkan virtual environment, lalu:
+
+```bash
+pip install -r Week-08/requirements.txt
+```
+
+## Menjalankan Eksperimen
+
+```bash
+python Week-08/main.py
+```
+
+Perintah tersebut menjalankan pipeline, ketiga model, evaluasi, dan pembuatan output. Untuk menjalankan tes integrasi:
+
+```bash
+python -m unittest discover -s Week-08/tests -v
+```
+
+## Menjalankan UI
+
+```bash
+streamlit run Week-08/app.py
+```
+
+UI memilih SVM dari hasil accuracy aktual. Pengguna dapat memilih satu sampel testing atau mengunggah CSV yang memiliki 51 kolom hasil preprocessing UTS. Input melewati scaler dan daftar fitur yang sama dengan proses training sebelum prediksi dijalankan.
+
+## Pembagian Kontribusi
+
+### Ahmad Mathlaul Falah - Naive Bayes & Evaluasi
 
 Branch: `falah/week-08-naive-bayes`
 
-Tanggung jawab:
+- implementasi, training, dan prediksi Gaussian Naive Bayes;
+- evaluasi Accuracy, Precision, Recall, F1-Score, dan Confusion Matrix;
+- penyiapan output serta penjelasan hasil Naive Bayes.
 
-- mengimplementasikan Naive Bayes;
-- melakukan training dan testing menggunakan data pipeline Week 08;
-- menghasilkan prediction;
-- membuat Confusion Matrix;
-- menghitung hasil evaluasi yang diperlukan;
-- menyiapkan output dan screenshot bagian Naive Bayes;
-- menyiapkan penjelasan bagian Naive Bayes untuk laporan.
-
-### Ah. Dliya'ul Adlha Jamalul Lail — SVM & Evaluasi
+### Ah. Dliya'ul Adlha Jamalul Lail - SVM & Evaluasi
 
 Branch: `adlha/week-08-svm`
 
-Tanggung jawab:
+- implementasi, training, dan prediksi SVM;
+- evaluasi Accuracy, Precision, Recall, F1-Score, dan Confusion Matrix;
+- penyiapan output serta penjelasan hasil SVM.
 
-- mengimplementasikan SVM;
-- melakukan training dan testing menggunakan data pipeline Week 08;
-- menghasilkan prediction;
-- membuat Confusion Matrix;
-- menghitung hasil evaluasi yang diperlukan;
-- menyiapkan output dan screenshot bagian SVM;
-- menyiapkan penjelasan bagian SVM untuk laporan.
+### Abdullah Azzam - Data Pipeline, Integrasi & UI
 
-### Abdullah Azzam — Data Pipeline, Integrasi & UI
+Branch: `azzam/week-08-pipeline` dan `azzam/week-08-ui`
 
-Branch: `azzam/week-08-pipeline-ui`
-
-Tanggung jawab:
-
-- menyiapkan dataset dan pipeline berdasarkan tahapan UTS;
-- memastikan split 80% training dan 20% testing;
-- memastikan Naive Bayes dan SVM menggunakan pipeline serta data yang konsisten;
-- mengintegrasikan hasil Naive Bayes dan SVM dengan hasil Decision Tree UTS;
-- setelah hasil perbandingan tersedia, membuat UI menggunakan Streamlit atau Flask untuk model dengan accuracy tertinggi;
-- menyiapkan output dan screenshot pipeline, integrasi, dan UI;
-- menyiapkan penjelasan bagian tersebut untuk laporan.
+- shared pipeline dan split 80:20;
+- integrasi Naive Bayes, SVM, dan Decision Tree UTS;
+- pemilihan model berdasarkan accuracy aktual;
+- aplikasi Streamlit yang memakai model terbaik.
 
 ## Dikerjakan Bersama
 
-- memastikan dataset sama dengan UTS;
-- menjalankan integrasi seluruh pipeline;
-- memastikan split 80:20;
-- membandingkan Naive Bayes, SVM, dan Decision Tree UTS;
+- memastikan dataset dan split sama untuk seluruh model;
+- menjalankan integrasi dan perbandingan model;
 - menganalisis Confusion Matrix;
-- menentukan model dengan accuracy tertinggi berdasarkan hasil aktual;
-- memastikan UI menggunakan model terbaik tersebut;
-- melakukan review Pull Request;
-- menyusun laporan akhir;
-- melakukan final review sebelum pengumpulan.
-
-## Workflow Git
-
-```text
-falah/week-08-naive-bayes
-adlha/week-08-svm
-azzam/week-08-pipeline-ui
-        ↓
-Pull Request
-        ↓
-review
-        ↓
-main
-```
+- review Pull Request;
+- menyusun laporan dan melakukan final review.
 
 ## Progress
 
 | Bagian | PIC | Status |
 | --- | --- | --- |
-| Data pipeline & split 80:20 | Abdullah Azzam | ⏳ Belum |
-| Naive Bayes | Ahmad Mathlaul Falah | ⏳ Belum |
-| Evaluasi Naive Bayes | Ahmad Mathlaul Falah | ⏳ Belum |
-| SVM | Ah. Dliya'ul Adlha Jamalul Lail | ⏳ Belum |
-| Evaluasi SVM | Ah. Dliya'ul Adlha Jamalul Lail | ⏳ Belum |
-| Perbandingan NB vs SVM vs Decision Tree | Bersama | ⏳ Belum |
-| UI model terbaik | Abdullah Azzam | ⏳ Belum |
-| Integrasi GitHub | Bersama | ⏳ Belum |
-| Laporan | Bersama | ⏳ Belum |
-| Final Review | Bersama | ⏳ Belum |
+| Data pipeline & split 80:20 | Abdullah Azzam | ? Selesai |
+| Naive Bayes | Ahmad Mathlaul Falah | ? Selesai |
+| Evaluasi Naive Bayes | Ahmad Mathlaul Falah | ? Selesai |
+| SVM | Ah. Dliya'ul Adlha Jamalul Lail | ? Selesai |
+| Evaluasi SVM | Ah. Dliya'ul Adlha Jamalul Lail | ? Selesai |
+| Perbandingan NB vs SVM vs Decision Tree | Bersama | ? Selesai |
+| UI model terbaik | Abdullah Azzam | ?? Proses |
+| Integrasi GitHub | Bersama | ?? Proses |
+| Laporan | Bersama | ?? Proses |
+| Final Review | Bersama | ?? Proses |
 
-Status yang digunakan: **⏳ Belum**, **🚧 Proses**, dan **✅ Selesai**.
+## Aset Laporan
 
-## Hasil
-
-Belum tersedia. Bagian ini diisi setelah implementasi dan pengujian selesai.
-
-## Cara Menjalankan
-
-Diisi setelah implementasi dan dependency Week 08 tersedia.
+Kode penting, output eksperimen, Confusion Matrix, perbandingan model, dan preview prediksi tersimpan pada `docs/assets/`. Preview UI dibuat dari fungsi prediksi nyata yang juga digunakan oleh `app.py`; preview tersebut bukan bukti bahwa server Streamlit telah berhasil dijalankan pada environment ini.
 
 [Kembali ke halaman utama](../README.md)
+
