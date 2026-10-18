@@ -43,7 +43,7 @@ Lihat [README UTS](UTS/README.md) untuk pipeline dan hasil terdahulu.
 
 ## Cara Kerja Kelompok
 
-Alur: **branch anggota  Pull Request  review  main**.
+Alur: **Branch anggota → Pull Request → Review → main**.
 
 Sebelum mulai, pastikan perubahan lokal sebelumnya sudah disimpan:
 
@@ -65,12 +65,13 @@ git push -u origin falah/week-08-naive-bayes
 
 Buka Pull Request menuju `main`. Tulis ringkasan perubahan dan cara pengecekannya; minta anggota lain melakukan review sebelum merge. Setelah merge, ambil perubahan terbaru dari `main` sebelum membuat branch berikutnya.
 
-Branch Week 08:
+Branch Week 08 sesuai penanggung jawab:
 
-- `falah/week-08-naive-bayes`
-- `adlha/week-08-svm`
-- `azzam/week-08-pipeline`
-- `azzam/week-08-ui`
+- Falah: `falah/week-08-naive-bayes`
+- Falah: `falah/week-08-ui`
+- Jamal: `adlha/week-08-svm`
+- Azzam: `azzam/week-08-pipeline`
+- Azzam: `azzam/week-08-comparison`
 
 Nama branch untuk periode berikutnya baru ditentukan setelah soalnya tersedia.
 
