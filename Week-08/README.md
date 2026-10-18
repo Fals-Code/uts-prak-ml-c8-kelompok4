@@ -113,55 +113,67 @@ streamlit run Week-08/app.py
 
 UI memilih SVM dari hasil accuracy aktual. Pengguna dapat memilih satu sampel testing atau mengunggah CSV yang memiliki 51 kolom hasil preprocessing UTS. Input melewati scaler dan daftar fitur yang sama dengan proses training sebelum prediksi dijalankan.
 
-## Pembagian Kontribusi
+## Pembagian Tugas
 
-### Ahmad Mathlaul Falah - Naive Bayes & Evaluasi
+### Ahmad Mathlaul Falah — Naive Bayes, Evaluasi, dan Streamlit
 
-Branch: `falah/week-08-naive-bayes`
+Branch: `falah/week-08-naive-bayes` dan `falah/week-08-ui`
 
-- implementasi, training, dan prediksi Gaussian Naive Bayes;
-- evaluasi Accuracy, Precision, Recall, F1-Score, dan Confusion Matrix;
-- penyiapan output serta penjelasan hasil Naive Bayes.
+- Mengimplementasikan Naive Bayes, training, testing, dan prediksi.
+- Membuat Confusion Matrix serta menghitung Accuracy, Precision, Recall, dan F1-Score.
+- Setelah perbandingan selesai, membuat UI Streamlit untuk model dengan accuracy tertinggi.
+- Menyiapkan screenshot, output, dan penjelasan bagian Naive Bayes serta UI.
+- Membuat Pull Request untuk bagiannya dan menindaklanjuti konflik atau error pada modul Naive Bayes dan UI.
 
-### Ah. Dliya'ul Adlha Jamalul Lail - SVM & Evaluasi
+### Ah. Dliya'ul Adlha Jamalul Lail (Jamal) — SVM, Evaluasi, dan Finalisasi Laporan
 
 Branch: `adlha/week-08-svm`
 
-- implementasi, training, dan prediksi SVM;
-- evaluasi Accuracy, Precision, Recall, F1-Score, dan Confusion Matrix;
-- penyiapan output serta penjelasan hasil SVM.
+- Mengimplementasikan SVM, training, testing, dan prediksi.
+- Membuat Confusion Matrix serta menghitung Accuracy, Precision, Recall, dan F1-Score.
+- Menyiapkan screenshot, output, dan penjelasan bagian SVM.
+- Menggabungkan materi laporan yang disiapkan anggota, merapikan format, dan menyiapkan ZIP sesuai ketentuan.
+- Membuat Pull Request untuk bagiannya dan menindaklanjuti konflik atau error pada modul SVM.
 
-### Abdullah Azzam - Data Pipeline, Integrasi & UI
+### Abdullah Azzam — Data Pipeline dan Perbandingan Model
 
-Branch: `azzam/week-08-pipeline` dan `azzam/week-08-ui`
+Branch: `azzam/week-08-pipeline` dan `azzam/week-08-comparison`
 
-- shared pipeline dan split 80:20;
-- integrasi Naive Bayes, SVM, dan Decision Tree UTS;
-- pemilihan model berdasarkan accuracy aktual;
-- aplikasi Streamlit yang memakai model terbaik.
+- Menyiapkan pipeline memakai dataset dan tahapan UTS serta split 80% training dan 20% testing.
+- Memastikan seluruh model memakai data dan skenario pengujian yang konsisten.
+- Menjalankan Decision Tree UTS sebagai pembanding apabila diperlukan.
+- Membandingkan Naive Bayes, SVM, dan Decision Tree berdasarkan hasil eksperimen aktual.
+- Menganalisis Confusion Matrix dan metrik ketiga model, termasuk kemampuan mengenali Attrition = Yes.
+- Menyiapkan screenshot, output, dan penjelasan bagian pipeline serta perbandingan model.
+- Membuat Pull Request untuk bagiannya dan menindaklanjuti konflik atau error pada modul pipeline/perbandingan.
+- Pekerjaan tambahan di luar pembagian ini dibahas dan disepakati terlebih dahulu, tidak otomatis dialihkan kepada Azzam.
 
-## Dikerjakan Bersama
+## Urutan Kerja
 
-- memastikan dataset dan split sama untuk seluruh model;
-- menjalankan integrasi dan perbandingan model;
-- menganalisis Confusion Matrix;
-- review Pull Request;
-- menyusun laporan dan melakukan final review.
+1. Azzam menyiapkan pipeline dan format data yang digunakan bersama.
+2. Falah dan Jamal mengerjakan Naive Bayes dan SVM secara paralel.
+3. Setelah kedua model selesai, Azzam membandingkan hasilnya dengan Decision Tree UTS.
+4. Setelah model dengan accuracy tertinggi diketahui, Falah menyelesaikan UI Streamlit.
+5. Setiap anggota menyerahkan screenshot, output, dan penjelasan untuk bagiannya.
+6. Jamal menggabungkan materi laporan, merapikan format, dan menyiapkan ZIP pengumpulan.
+7. Ketiga anggota memeriksa bagian masing-masing dan melakukan review akhir. Pemilik bagian menindaklanjuti temuannya.
+
+Desain UI dan kerangka laporan boleh mulai dicicil lebih awal jika tidak bergantung pada hasil model.
 
 ## Progress
 
 | Bagian | PIC | Status |
 | --- | --- | --- |
-| Data pipeline & split 80:20 | Abdullah Azzam | ? Selesai |
-| Naive Bayes | Ahmad Mathlaul Falah | ? Selesai |
-| Evaluasi Naive Bayes | Ahmad Mathlaul Falah | ? Selesai |
-| SVM | Ah. Dliya'ul Adlha Jamalul Lail | ? Selesai |
-| Evaluasi SVM | Ah. Dliya'ul Adlha Jamalul Lail | ? Selesai |
-| Perbandingan NB vs SVM vs Decision Tree | Bersama | ? Selesai |
-| UI model terbaik | Abdullah Azzam | ?? Proses |
-| Integrasi GitHub | Bersama | ?? Proses |
-| Laporan | Bersama | ?? Proses |
-| Final Review | Bersama | ?? Proses |
+| Data pipeline & split 80:20 | Abdullah Azzam | ✅ Selesai |
+| Naive Bayes | Ahmad Mathlaul Falah | ✅ Selesai |
+| Evaluasi Naive Bayes | Ahmad Mathlaul Falah | ✅ Selesai |
+| SVM | Ah. Dliya'ul Adlha Jamalul Lail | ✅ Selesai |
+| Evaluasi SVM | Ah. Dliya'ul Adlha Jamalul Lail | ✅ Selesai |
+| Perbandingan NB vs SVM vs Decision Tree | Abdullah Azzam | ✅ Selesai |
+| UI model terbaik | Ahmad Mathlaul Falah | 🚧 Proses |
+| Pull Request dan integrasi | Falah, Jamal, dan Azzam (masing-masing untuk bagiannya) | ✅ Selesai |
+| Penggabungan laporan dan ZIP | Ah. Dliya'ul Adlha Jamalul Lail | ⏳ Belum |
+| Review akhir dan tindak lanjut temuan | Falah, Jamal, dan Azzam | ⏳ Belum |
 
 ## Aset Laporan
 
