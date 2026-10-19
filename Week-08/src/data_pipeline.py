@@ -33,8 +33,6 @@ class PipelineData:
     scaler: MinMaxScaler
     feature_columns: list[str]
     selected_features: list[str]
-    mi_scores: pd.Series
-    source_path: Path
 
 
 def load_preprocessed(path: Path | str = DEFAULT_DATA_PATH) -> tuple[pd.DataFrame, pd.Series]:
@@ -107,8 +105,6 @@ def prepare_pipeline(path: Path | str = DEFAULT_DATA_PATH) -> PipelineData:
         scaler=scaler,
         feature_columns=X.columns.tolist(),
         selected_features=selected_features,
-        mi_scores=mi_scores,
-        source_path=source.resolve(),
     )
 
 
