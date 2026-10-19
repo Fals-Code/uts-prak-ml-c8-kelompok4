@@ -27,10 +27,17 @@ Week-08/
 │   └── comparison.py
 ├── tests/
 └── outputs/
-    └── metrics.json
+    ├── metrics.json
+    ├── split/
+    │   ├── X_train.csv
+    │   ├── X_test.csv
+    │   ├── y_train.csv
+    │   └── y_test.csv
+    └── models/
+        └── naive_bayes.joblib
 ```
 
-`prepare_pipeline()` di `src/data_pipeline.py` memberi semua model split yang sama: 80% training dan 20% testing, `random_state=42`, stratifikasi target, MinMaxScaler, dan 20 fitur terpilih oleh Mutual Information. Scaler dan seleksi fitur di-fit hanya dari training. Jamal dapat memakai `X_train`, `X_test`, `y_train`, dan `y_test` dari objek `PipelineData`; tidak perlu membuat split atau CSV baru.
+`prepare_pipeline()` di `src/data_pipeline.py` menghasilkan split yang dipakai semua model: 80% training dan 20% testing, `random_state=42`, stratifikasi target, MinMaxScaler, dan 20 fitur hasil Mutual Information. Scaler dan seleksi fitur hanya di-fit pada training.
 
 ## Instalasi dan Menjalankan
 
@@ -42,7 +49,20 @@ python -m venv .venv
 .\.venv\Scripts\python.exe Week-08\main.py
 ```
 
-Program melatih Gaussian Naive Bayes, SVM, dan Decision Tree pada pipeline bersama, mencetak hasil evaluasi, dan membuat ulang output di `Week-08/outputs/`. File `metrics.json` dipertahankan sebagai ringkasan hasil untuk anggota berikutnya; grafik dan output terminal dapat dibuat ulang saat program dijalankan.
+Program menjalankan eksperimen pada pipeline bersama dan membuat output di `Week-08/outputs/`. Empat CSV split tersimpan di `outputs/split/`; indeks asli disimpan pada kolom `index`, sedangkan urutan 20 fitur dipertahankan pada header `X_train.csv` dan `X_test.csv`. `y_train.csv` dan `y_test.csv` berisi kolom `Attrition`.
+
+Jamal dapat membaca CSV tanpa preprocessing atau split ulang:
+
+```python
+import pandas as pd
+
+X_train = pd.read_csv("Week-08/outputs/split/X_train.csv", index_col="index")
+X_test = pd.read_csv("Week-08/outputs/split/X_test.csv", index_col="index")
+y_train = pd.read_csv("Week-08/outputs/split/y_train.csv", index_col="index")["Attrition"]
+y_test = pd.read_csv("Week-08/outputs/split/y_test.csv", index_col="index")["Attrition"]
+```
+
+Model hasil training Gaussian Naive Bayes tersimpan di `outputs/models/naive_bayes.joblib`. Azzam dapat memuatnya dengan `joblib.load("Week-08/outputs/models/naive_bayes.joblib")` dan memberikan `X_test` yang kolom serta urutannya tetap dipertahankan.
 
 Pengujian:
 

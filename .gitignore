@@ -31,6 +31,10 @@ Thumbs.db
 # Output Week 08 dibuat ulang oleh main.py; metrik dipertahankan untuk handoff
 /Week-08/outputs/*
 !/Week-08/outputs/metrics.json
+!/Week-08/outputs/split/
+!/Week-08/outputs/split/*.csv
+!/Week-08/outputs/models/
+!/Week-08/outputs/models/*.joblib
 
 # Dataset dan arsip lokal di root bukan bagian dari Week 08
 /data/
