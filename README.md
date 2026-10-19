@@ -15,7 +15,7 @@ Repository kerja kelompok Praktikum Machine Learning 2026 dari **UTS  Week 08 
 | Week 13 | [Week-13](Week-13/) | ? Menunggu soal |
 | UAS | [UAS](UAS/) | ? Menunggu soal |
 
-Implementasi dan evaluasi model Week 08 sudah tersedia. Validasi runtime Streamlit masih dilakukan. Week 09-13 dan UAS tetap menunggu soal; requirement dan pembagian tugasnya belum ditentukan.
+Implementasi dan evaluasi model Week 08 sudah tersedia. UI Streamlit masih perlu divalidasi oleh penanggung jawabnya. Week 09-13 dan UAS tetap menunggu soal; requirement dan pembagian tugasnya belum ditentukan.
 
 ## Anggota Kelompok
 
@@ -50,7 +50,7 @@ Sebelum mulai, pastikan perubahan lokal sebelumnya sudah disimpan:
 ```bash
 git checkout main
 git pull origin main
-git checkout -b falah/week-08-naive-bayes
+git checkout -b falah/week-08-pipeline-naive-bayes
 ```
 
 Kerjakan tugas di folder periodenya. Setelah selesai, periksa perubahan dan pastikan tidak ada kredensial atau file sementara yang ikut:
@@ -60,18 +60,16 @@ git status
 git diff
 git add .
 git commit -m "week 08: deskripsi pekerjaan"
-git push -u origin falah/week-08-naive-bayes
+git push -u origin falah/week-08-pipeline-naive-bayes
 ```
 
 Buka Pull Request menuju `main`. Tulis ringkasan perubahan dan cara pengecekannya; minta anggota lain melakukan review sebelum merge. Setelah merge, ambil perubahan terbaru dari `main` sebelum membuat branch berikutnya.
 
 Branch Week 08 sesuai penanggung jawab:
 
-- Falah: `falah/week-08-naive-bayes`
-- Falah: `falah/week-08-ui`
-- Jamal: `adlha/week-08-svm`
-- Azzam: `azzam/week-08-pipeline`
-- Azzam: `azzam/week-08-comparison`
+- Falah: data pipeline, preprocessing, split 80:20, Naive Bayes, evaluasi, screenshot, output, dan laporan bagian Falah (`falah/week-08-pipeline-naive-bayes`).
+- Jamal: SVM, Decision Tree pembanding, evaluasi kedua model, screenshot, output, dan laporan bagian Jamal.
+- Azzam: perbandingan tiga model, analisis keseluruhan, UI Streamlit, penggabungan laporan, dan ZIP pengumpulan.
 
 Nama branch untuk periode berikutnya baru ditentukan setelah soalnya tersedia.
 

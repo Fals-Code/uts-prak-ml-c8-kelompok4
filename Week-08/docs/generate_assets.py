@@ -2,7 +2,6 @@
 
 from pathlib import Path
 import sys
-import textwrap
 
 import matplotlib.pyplot as plt
 from PIL import Image
@@ -14,44 +13,6 @@ sys.path.insert(0, str(WEEK_DIR))
 
 from src.comparison import run_experiment
 from src.data_pipeline import transform_for_prediction
-
-
-def code_image(source: Path, destination: Path, title: str, start: int, end: int):
-    lines = source.read_text(encoding="utf-8").splitlines()[start - 1:end]
-    numbered = "\n".join(f"{number:>3}  {line}" for number, line in enumerate(lines, start=start))
-    height = max(5.0, min(12.0, 0.27 * len(lines) + 1.7))
-    fig, ax = plt.subplots(figsize=(13, height), facecolor="#111827")
-    ax.set_facecolor("#111827")
-    ax.axis("off")
-    ax.text(0.02, 0.97, title, color="#f9fafb", fontsize=14, fontweight="bold", va="top")
-    ax.text(0.02, 0.91, numbered, color="#d1d5db", family="monospace", fontsize=8.2, va="top")
-    fig.savefig(
-        destination,
-        dpi=80,
-        bbox_inches="tight",
-        facecolor=fig.get_facecolor(),
-        pil_kwargs={"quality": 58, "optimize": True},
-    )
-    plt.close(fig)
-
-
-def text_image(source: Path, destination: Path, title: str):
-    text = source.read_text(encoding="utf-8")
-    wrapped = "\n".join(textwrap.fill(line, width=105, subsequent_indent="  ") for line in text.splitlines())
-    line_count = len(wrapped.splitlines())
-    fig, ax = plt.subplots(figsize=(13, max(6, min(15, 0.25 * line_count + 2))), facecolor="#0f172a")
-    ax.set_facecolor("#0f172a")
-    ax.axis("off")
-    ax.text(0.02, 0.97, title, color="white", fontsize=14, fontweight="bold", va="top")
-    ax.text(0.02, 0.92, wrapped, color="#e2e8f0", family="monospace", fontsize=8.2, va="top")
-    fig.savefig(
-        destination,
-        dpi=80,
-        bbox_inches="tight",
-        facecolor=fig.get_facecolor(),
-        pil_kwargs={"quality": 58, "optimize": True},
-    )
-    plt.close(fig)
 
 
 def ui_preview(destination: Path):
@@ -98,10 +59,6 @@ def ui_preview(destination: Path):
 
 def main():
     ASSET_DIR.mkdir(parents=True, exist_ok=True)
-    code_image(WEEK_DIR / "src" / "data_pipeline.py", ASSET_DIR / "code_pipeline.jpg", "Kode shared data pipeline", 44, 94)
-    code_image(WEEK_DIR / "src" / "naive_bayes.py", ASSET_DIR / "code_naive_bayes.jpg", "Kode Naive Bayes", 1, 20)
-    code_image(WEEK_DIR / "src" / "svm_model.py", ASSET_DIR / "code_svm.jpg", "Kode SVM", 1, 25)
-    text_image(OUTPUT_DIR / "console_output.txt", ASSET_DIR / "console_output.jpg", "Output eksperimen Week 08")
     for name in [
         "confusion_matrix_naive_bayes.png",
         "confusion_matrix_svm.png",
