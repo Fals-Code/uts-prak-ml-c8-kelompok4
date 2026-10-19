@@ -179,5 +179,7 @@ Desain UI dan kerangka laporan boleh mulai dicicil lebih awal jika tidak bergant
 
 Kode penting, output eksperimen, Confusion Matrix, perbandingan model, dan preview prediksi tersimpan pada `docs/assets/`. Preview UI dibuat dari fungsi prediksi nyata yang juga digunakan oleh `app.py`; preview tersebut bukan bukti bahwa server Streamlit telah berhasil dijalankan pada environment ini.
 
+Draft laporan bagian Naive Bayes Falah tersedia pada [Laporan_Falah_Week08.md](docs/Laporan_Falah_Week08.md). Draft tersebut memuat placeholder screenshot dan panduan pengambilan gambar melalui VS Code.
+
 [Kembali ke halaman utama](../README.md)
 
