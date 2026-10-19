@@ -2,6 +2,8 @@
 
 from pathlib import Path
 
+import joblib
+
 from src.comparison import MODEL_ORDER, comparison_frame, run_experiment, save_results
 
 WEEK_DIR = Path(__file__).resolve().parent
@@ -12,6 +14,32 @@ def main():
     pipeline = experiment["pipeline"]
     metrics = experiment["metrics"]
     output_paths = save_results(experiment, WEEK_DIR / "outputs")
+
+    split_dir = WEEK_DIR / "outputs" / "split"
+    split_dir.mkdir(parents=True, exist_ok=True)
+    pipeline.X_train.to_csv(split_dir / "X_train.csv", index_label="index")
+    pipeline.X_test.to_csv(split_dir / "X_test.csv", index_label="index")
+    pipeline.y_train.to_frame(name="Attrition").to_csv(
+        split_dir / "y_train.csv", index_label="index"
+    )
+    pipeline.y_test.to_frame(name="Attrition").to_csv(
+        split_dir / "y_test.csv", index_label="index"
+    )
+
+    model_dir = WEEK_DIR / "outputs" / "models"
+    model_dir.mkdir(parents=True, exist_ok=True)
+    model_path = model_dir / "naive_bayes.joblib"
+    joblib.dump(experiment["models"]["Naive Bayes"], model_path)
+
+    output_paths.update(
+        {
+            "X_train": split_dir / "X_train.csv",
+            "X_test": split_dir / "X_test.csv",
+            "y_train": split_dir / "y_train.csv",
+            "y_test": split_dir / "y_test.csv",
+            "model_naive_bayes": model_path,
+        }
+    )
 
     print("=" * 72)
     print("HASIL KLASIFIKASI WEEK 08 - KELOMPOK 4 C8")
