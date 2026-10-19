@@ -27,3 +27,11 @@ Thumbs.db
 /UTS/data/mi_selected/
 /UTS/data/l1_selected/
 /UTS/outputs/
+
+# Output Week 08 dibuat ulang oleh main.py; metrik dipertahankan untuk handoff
+/Week-08/outputs/*
+!/Week-08/outputs/metrics.json
+
+# Dataset dan arsip lokal di root bukan bagian dari Week 08
+/data/
+/*.zip
