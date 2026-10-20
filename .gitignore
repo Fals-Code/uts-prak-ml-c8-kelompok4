@@ -35,6 +35,10 @@ Thumbs.db
 !/Week-08/outputs/split/*.csv
 !/Week-08/outputs/models/
 !/Week-08/outputs/models/*.joblib
+!/Week-08/outputs/figures/
+!/Week-08/outputs/figures/*
+!/Week-08/outputs/extra/
+!/Week-08/outputs/extra/*
 
 # Dataset dan arsip lokal di root bukan bagian dari Week 08
 /data/
