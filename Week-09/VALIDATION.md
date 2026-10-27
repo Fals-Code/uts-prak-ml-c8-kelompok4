@@ -46,3 +46,16 @@ menambahkan skip bersyarat pada dua metode yang membutuhkan input lokal.
 Audit commit dan clone publik dilakukan terpisah dari berkas ini; hasil rinci
 serta SHA persiapan dicatat pada artefak migrasi privat. Jangan mengartikan
 berbagi kode/hasil agregat sebagai izin mendistribusikan kembali dataset Mall.
+
+## Audit ulang setelah migrasi ke empat branch
+
+Pipeline pada branch falah kembali menghasilkan Mall 200 × 4 dan Telco
+7.043 × 12; empat tes lulus. Pengujian pada clone terpisah tanpa Mall menghasilkan
+dua tes lulus dan dua SKIP yang beralasan. Pemanggilan pipeline dalam kondisi
+tanpa Mall berakhir dengan exit 1 dan pesan file hilang, bukan klaim sukses.
+Hasil pengujian ini tidak menjalankan K-Modes atau evaluasi cluster.
+
+Persyaratan versi ditinjau melalui metadata dependency terpasang: Pandas >=3.11,
+NumPy >=3.12, Matplotlib >=3.11. Karena itu petunjuk instalasi memakai minimum
+Python 3.12, dengan lingkungan acuan yang sudah diuji tetap Python 3.14.6.
+Tidak ada perubahan versi dependency atau metode transformasi.

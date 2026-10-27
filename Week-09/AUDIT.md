@@ -21,3 +21,22 @@ lokal dan diabaikan Git. Lihat PUBLICATION.md dan VALIDATION.md.
 Tidak ada push, penghapusan remote, force push, merge ke main, perubahan stash,
 atau perubahan Google Docs pada tahap ini. Daftar 12 branch lama tetap kandidat
 pembersihan; eksekusinya membutuhkan persetujuan daftar terbaru.
+
+## Audit akhir tanggung jawab Falah setelah migrasi
+
+Branch aktif untuk perbaikan akhir adalah falah. Empat remote branch aktual
+telah diperiksa; main, jamal, dan azzam tetap pada commit hasil integrasi Week 08.
+Kode preprocessing, pemilihan fitur, tertil, dan tes tidak diimplementasikan ulang.
+Satu koreksi kompatibilitas diperlukan: NumPy 2.5.3 memerlukan Python >=3.12,
+sehingga petunjuk Python 3.11+ diperbaiki. Identitas repository dipisahkan dari
+identitas sampul laporan yang telah diedit kelompok; sampul tidak diubah.
+
+Dengan kedua input lokal pipeline berjalan dan empat tes lulus. Clone tanpa
+Mall menjalankan dua tes mandiri dan melewati dua tes bergantung Mall dengan
+alasan eksplisit. Pemanggilan pipeline tanpa Mall berhenti dengan exit 1 yang
+menyebut file hilang, tanpa traceback atau klaim sukses. Hasil tetap lokal.
+
+Laporan bagian Falah diperiksa terhadap hasil aktual, termasuk keterbatasan
+tertil dan kategori nominal. Penyebutan Zoo/class.csv pada pembagian lama dan
+daftar isi Week 08 tetap dicatat untuk finalisasi Azzam, sesuai instruksi terbaru
+yang memakai Mall dan Telco. Bagian anggota lain tidak dikerjakan.

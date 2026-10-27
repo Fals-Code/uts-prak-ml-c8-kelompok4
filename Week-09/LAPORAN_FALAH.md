@@ -58,7 +58,8 @@ dan biaya bulanan. Churn disimpan sebagai informasi pembanding eksternal,
 tanpa menjadi masukan pengelompokan. Pemakaian Telco mengikuti instruksi
 terbaru tugas; penyebutan Zoo pada dokumen pembagian lama perlu diselaraskan
 pada finalisasi. Nomor penugasan dataset adalah Kelompok 1 sesuai informasi
-pengguna, sedangkan identitas repository dan laporan tetap Kelompok 4 kelas C8.
+pengguna. Nama repository tetap uts-prak-ml-c8-kelompok4; identitas laporan
+mengikuti sampul dokumen kelompok.
 
 ## 2.2 Karakteristik Dataset
 

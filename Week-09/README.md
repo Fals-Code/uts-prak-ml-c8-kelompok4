@@ -1,8 +1,9 @@
 # Week 09 — Dataset, EDA, dan preprocessing K-Modes
 
 Penanggung jawab: **Ahmad Mathlaul Falah — 434241123**, kelas C8.
-Penugasan dataset: Kelompok 1 menurut informasi pengguna; repository/laporan:
-Kelompok 4. Deadline: 28 Oktober 2026 pukul 23.59 WIB.
+Penugasan dataset: Kelompok 1 menurut informasi pengguna. Nama repository tetap
+memuat Kelompok 4; identitas laporan mengikuti sampul dokumen kelompok.
+Deadline: 28 Oktober 2026 pukul 23.59 WIB.
 
 Bagian ini menyiapkan data untuk Jamal. Model, jumlah cluster, cost, evaluasi,
 dan interpretasi cluster belum dikerjakan di sini. Azzam menangani integrasi
@@ -36,21 +37,31 @@ git check-ignore Week-09/data/raw/Mall_Customers.csv
 
 ## Menjalankan
 
-Gunakan Python 3.11+; lingkungan yang benar-benar diuji: Python 3.14.6,
+Gunakan Python 3.12+ karena NumPy 2.5.3 mensyaratkan versi tersebut;
+lingkungan yang benar-benar diuji: Python 3.14.6,
 Pandas 3.0.6, NumPy 2.5.3, Matplotlib 3.11.2. Python lain belum diuji.
 
 ```powershell
-python -m pip install -r Week-09/requirements.txt
-python Week-09/preprocessing.py
-python -m unittest discover -s Week-09 -p test_preprocessing.py -v
-python Week-09/make_evidence.py
+python --version
+python -m venv .venv
+.\.venv\Scripts\python.exe -m pip install -r Week-09/requirements.txt
+.\.venv\Scripts\python.exe Week-09/preprocessing.py
+.\.venv\Scripts\python.exe -m unittest discover -s Week-09 -p test_preprocessing.py -v
+.\.venv\Scripts\python.exe Week-09/make_evidence.py
 ```
+
+Contoh di atas untuk PowerShell Windows tanpa perlu aktivasi environment.
+Pada Linux/macOS gunakan `.venv/bin/python` untuk perintah setelah pembuatan venv.
+Pastikan `python --version` memenuhi versi minimum sebelum membuat environment.
 
 Jalankan perintah di atas dari root repository. Di workspace Falah interpreter
 yang digunakan ialah `.venv/Scripts/python.exe`. Path data dihitung dari lokasi
 script sehingga entry point juga bekerja dari direktori lain. `--output-dir folder`
 menyimpan seluruh hasil pada folder alternatif, termasuk fitur di `folder/processed`.
-Tidak memerlukan internet, scikit-learn, kmodes, atau aplikasi web.
+Eksekusi setelah instalasi dependency dan penyediaan input tidak memerlukan
+internet, scikit-learn, kmodes, atau aplikasi web. Jika memakai `--output-dir`,
+pilih lokasi di luar repository: aturan ignore hanya mencakup folder standar,
+bukan sembarang folder alternatif.
 
 ## File publik dan hasil lokal
 
@@ -205,6 +216,15 @@ mall = pd.read_csv(folder / "mall_kmodes.csv", dtype=str)
 telco = pd.read_csv(folder / "telco_kmodes.csv", dtype=str)
 mall_reference = pd.read_csv(folder / "mall_reference.csv")
 telco_reference = pd.read_csv(folder / "telco_reference.csv")
+
+# Pemeriksaan ringkas setelah preprocessing; empat tes menyediakan pemeriksaan lengkap.
+assert mall.shape == (200, 4) and telco.shape == (7043, 12)
+for features in [mall, telco]:
+    assert not features.isna().any().any()
+    assert not features.apply(lambda column: column.str.strip().eq("")).any().any()
+    assert set(features).isdisjoint({"CustomerID", "customerID", "Churn", "source_row"})
+assert mall_reference.source_row.tolist() == list(range(len(mall)))
+assert telco_reference.source_row.tolist() == list(range(len(telco)))
 
 # Setelah Jamal menghasilkan label, cocokkan secara posisi TANPA mengurutkan.
 # telco_reference["cluster"] = labels_telco
