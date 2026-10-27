@@ -1,0 +1,9 @@
+.test-*/
+data/raw/*
+!data/raw/SOURCES.md
+!data/raw/Telco-Customer-Churn.csv
+!data/raw/TELCO_SOURCE_LICENSE.txt
+data/processed/
+outputs/
+*.zip
+*.bundle
