@@ -46,8 +46,14 @@ SIL_SAMPLE_SIZE = 3000    # sampel acak untuk silhouette bila baris lebih banyak
 
 # Diisi pada Step 4 setelah melihat hasil elbow + silhouette (🛑 keputusan Jamal)
 K_FINAL = {
-    "mall":  {"k": None, "reason": ""},
-    "telco": {"k": None, "reason": ""},
+    "mall": {
+        "k": 3,
+        "reason": "Titik tekuk elbow otomatis dengan penurunan cost signifikan 24.31% dan silhouette Hamming 0.3029; menghasilkan 3 segmen yang seimbang dan mudah diinterpretasikan pada 4 fitur kategorikal.",
+    },
+    "telco": {
+        "k": 4,
+        "reason": "Titik elbow optimal dengan penurunan cost 10.87% dan silhouette 0.2429; penurunan cost setelah k=4 melandai drastis (<5%) sementara kualitas dan pemisahan cluster tetap stabil.",
+    },
 }
 
 # Urutan kategori ordinal untuk grafik (bahasa Indonesia lowercase sesuai preprocessing Falah)
@@ -251,6 +257,24 @@ def plot_k_selection(name: str, sel: pd.DataFrame) -> None:
     fig.tight_layout()
     fig.savefig(FIG_DIR / f"{name}_k_selection.png", dpi=150)
     plt.close(fig)
+
+
+# ---------------------------------------------------------------------------
+# STEP 4: KEPUTUSAN K FINAL
+# ---------------------------------------------------------------------------
+def require_k(name: str) -> int:
+    k = K_FINAL[name]["k"]
+    if k is None:
+        raise SystemExit(
+            f"K_FINAL['{name}'] belum diisi. Jalankan --stage elbow, pilih k, lalu isi K_FINAL."
+        )
+    return int(k)
+
+
+def save_k_decision() -> None:
+    out = {n: {"k": K_FINAL[n]["k"], "reason": K_FINAL[n]["reason"]} for n in DATASETS}
+    with open(TABLE_DIR / "k_final.json", "w", encoding="utf-8") as f:
+        json.dump(out, f, indent=2, ensure_ascii=False)
 
 
 # ---------------------------------------------------------------------------
