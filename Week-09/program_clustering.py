@@ -397,6 +397,61 @@ def stability_check(name: str, X: pd.DataFrame, k: int, final_labels: np.ndarray
 
 
 # ---------------------------------------------------------------------------
+# STEP 8: VISUALISASI
+# ---------------------------------------------------------------------------
+def plot_cluster_sizes(name: str, clustered: pd.DataFrame) -> None:
+    counts = clustered["cluster"].value_counts().sort_index()
+    fig, ax = plt.subplots(figsize=(7.5, 4.8))
+    bars = ax.bar(counts.index.astype(str), counts.values,
+                  color=sns.color_palette("Set2", len(counts)))
+    for b, v in zip(bars, counts.values):
+        ax.text(b.get_x() + b.get_width() / 2, v, f"{v}\n({v / len(clustered) * 100:.1f}%)",
+                ha="center", va="bottom", fontsize=9)
+    ax.set_xlabel("Cluster"); ax.set_ylabel("Jumlah anggota")
+    ax.set_ylim(0, counts.max() * 1.18)
+    ax.set_title(f"Ukuran cluster - {DATASETS[name]['title']}")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / f"{name}_cluster_sizes.png", dpi=150)
+    plt.close(fig)
+
+
+def plot_heatmap(name: str, prop: pd.DataFrame) -> None:
+    p = prop.copy()
+    p["feature_category"] = p["feature"] + " = " + p["category"]
+    pivot = p.pivot_table(index="feature_category", columns="cluster",
+                          values="share", sort=False)
+    fig, ax = plt.subplots(figsize=(1.6 * pivot.shape[1] + 5, max(4, 0.34 * len(pivot))))
+    sns.heatmap(pivot, annot=True, fmt=".2f", cmap="YlGnBu", vmin=0, vmax=1,
+                cbar_kws={"label": "Proporsi dalam cluster"}, ax=ax)
+    ax.set_xlabel("Cluster"); ax.set_ylabel("")
+    ax.set_title(f"Proporsi kategori per cluster - {DATASETS[name]['title']}")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / f"{name}_heatmap_proportions.png", dpi=150)
+    plt.close(fig)
+
+
+def plot_stacked(name: str, X: pd.DataFrame, clustered: pd.DataFrame) -> None:
+    feats = DATASETS[name]["key_features"]
+    n = len(feats)
+    ncols = 3 if n > 4 else 2
+    nrows = math.ceil(n / ncols)
+    fig, axes = plt.subplots(nrows, ncols, figsize=(5.6 * ncols, 4.2 * nrows), squeeze=False)
+    for ax, f in zip(axes.ravel(), feats):
+        ct = pd.crosstab(clustered["cluster"], X[f], normalize="index") * 100
+        ct = ct[order_categories(ct.columns)]
+        ct.plot(kind="bar", stacked=True, ax=ax, colormap="tab20c", width=0.8)
+        ax.set_title(f); ax.set_xlabel("Cluster"); ax.set_ylabel("Persentase (%)")
+        ax.tick_params(axis="x", rotation=0)
+        ax.legend(fontsize=7, loc="upper left", bbox_to_anchor=(1.0, 1.0))
+    for ax in axes.ravel()[n:]:
+        ax.axis("off")
+    fig.suptitle(f"Komposisi fitur utama per cluster - {DATASETS[name]['title']}")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / f"{name}_stacked_features.png", dpi=150)
+    plt.close(fig)
+
+
+# ---------------------------------------------------------------------------
 # MAIN (diperluas pada step berikutnya)
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -428,6 +483,9 @@ def main() -> None:
             profile, prop = cluster_profile(name, X, clustered)
             evaluate_final(name, X, km, labels, k)
             stability_check(name, X, k, labels)
+            plot_cluster_sizes(name, clustered)
+            plot_heatmap(name, prop)
+            plot_stacked(name, X, clustered)
 
 
 if __name__ == "__main__":
