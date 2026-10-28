@@ -23,7 +23,7 @@ import pandas as pd
 import seaborn as sns
 from kmodes.kmodes import KModes
 from scipy.spatial.distance import pdist, squareform
-from sklearn.metrics import silhouette_score
+from sklearn.metrics import adjusted_rand_score, silhouette_score
 
 # ---------------------------------------------------------------------------
 # KONFIGURASI
@@ -358,6 +358,45 @@ def cluster_profile(name: str, X: pd.DataFrame, clustered: pd.DataFrame):
 
 
 # ---------------------------------------------------------------------------
+# STEP 7: EVALUASI + STABILITAS
+# ---------------------------------------------------------------------------
+def evaluate_final(name: str, X: pd.DataFrame, km, labels: np.ndarray, k: int) -> dict:
+    idx, D = prepare_distance(X)
+    lab = labels[idx]
+    sil = float(silhouette_score(D, lab, metric="precomputed")) if len(np.unique(lab)) > 1 else float("nan")
+    n, m = X.shape
+    result = {
+        "dataset": name, "k": int(k), "n_rows": int(n), "n_features": int(m),
+        "init": INIT, "n_init": N_INIT_FINAL, "seed": SEED,
+        "cost": float(km.cost_), "n_iter": int(km.n_iter_),
+        "mean_mismatch_per_feature": float(km.cost_) / (n * m),
+        "silhouette_hamming": sil,
+        "silhouette_sample_size": int(len(idx)),
+        "silhouette_on_sample": bool(len(idx) < n),
+    }
+    with open(TABLE_DIR / f"{name}_evaluation.json", "w", encoding="utf-8") as f:
+        json.dump(result, f, indent=2)
+    print(f"\n[{name}] Evaluasi final:")
+    for key, val in result.items():
+        print(f"    {key}: {val}")
+    return result
+
+
+def stability_check(name: str, X: pd.DataFrame, k: int, final_labels: np.ndarray) -> pd.DataFrame:
+    """Fit ulang dengan seed lain; ARI terhadap hasil final (1.0 = partisi identik)."""
+    rows = []
+    for s in STABILITY_SEEDS:
+        km, lab = fit_kmodes(X, k, N_INIT_STABILITY, seed=s)
+        rows.append({"seed": s, "cost": float(km.cost_),
+                     "ari_vs_final": float(adjusted_rand_score(final_labels, lab))})
+    df = pd.DataFrame(rows)
+    df.to_csv(TABLE_DIR / f"{name}_stability.csv", index=False)
+    print(f"\n[{name}] Uji stabilitas antar seed:")
+    print(df.round(4).to_string(index=False))
+    return df
+
+
+# ---------------------------------------------------------------------------
 # MAIN (diperluas pada step berikutnya)
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -387,6 +426,8 @@ def main() -> None:
             k = require_k(name)
             km, labels, clustered = fit_final(name, X, ref, k)
             profile, prop = cluster_profile(name, X, clustered)
+            evaluate_final(name, X, km, labels, k)
+            stability_check(name, X, k, labels)
 
 
 if __name__ == "__main__":
