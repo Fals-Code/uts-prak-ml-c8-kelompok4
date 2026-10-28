@@ -303,6 +303,61 @@ def fit_final(name: str, X: pd.DataFrame, ref: pd.DataFrame, k: int):
 
 
 # ---------------------------------------------------------------------------
+# STEP 6: PROFIL CLUSTER
+# ---------------------------------------------------------------------------
+def order_categories(cats):
+    cats = list(cats)
+    for order in ORDINAL_ORDERS:
+        if set(cats) <= set(order):
+            return [c for c in order if c in cats]
+    return sorted(cats)
+
+
+def build_proportions(X: pd.DataFrame, labels: pd.Series) -> pd.DataFrame:
+    """Proporsi tiap kategori di tiap cluster, proporsi keseluruhan, dan lift = share / overall."""
+    rows = []
+    for f in X.columns:
+        ct = pd.crosstab(labels, X[f], normalize="index")
+        ct = ct[order_categories(ct.columns)]
+        overall = X[f].value_counts(normalize=True)
+        for c in ct.index:
+            for cat in ct.columns:
+                share = float(ct.loc[c, cat])
+                ov = float(overall[cat])
+                rows.append({"cluster": int(c), "feature": f, "category": cat,
+                             "share": share, "overall_share": ov, "lift": share / ov})
+    return pd.DataFrame(rows)
+
+
+def cluster_profile(name: str, X: pd.DataFrame, clustered: pd.DataFrame):
+    labels = clustered["cluster"]
+    rows = []
+    for c in sorted(labels.unique()):
+        sub = X[labels == c]
+        row = {"cluster": int(c), "size": len(sub), "pct": round(len(sub) / len(X) * 100, 2)}
+        for f in X.columns:
+            vc = sub[f].value_counts(normalize=True)
+            row[f] = f"{vc.index[0]} ({vc.iloc[0] * 100:.1f}%)"
+        rows.append(row)
+    profile = pd.DataFrame(rows)
+    profile.to_csv(TABLE_DIR / f"{name}_cluster_profile.csv", index=False)
+
+    prop = build_proportions(X, labels)
+    prop.to_csv(TABLE_DIR / f"{name}_cluster_category_proportions.csv", index=False)
+
+    distinctive = (prop[prop["share"] >= 0.20]
+                   .sort_values(["cluster", "lift"], ascending=[True, False])
+                   .groupby("cluster").head(5))
+    distinctive.to_csv(TABLE_DIR / f"{name}_cluster_distinctive.csv", index=False)
+
+    print(f"\n[{name}] Profil cluster (mode per fitur dan persentasenya di dalam cluster):")
+    print(profile.to_string(index=False))
+    print(f"\n[{name}] Kategori khas (share >= 20%, urut lift):")
+    print(distinctive.round(3).to_string(index=False))
+    return profile, prop
+
+
+# ---------------------------------------------------------------------------
 # MAIN (diperluas pada step berikutnya)
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -331,6 +386,7 @@ def main() -> None:
             X, ref = load_dataset(name)
             k = require_k(name)
             km, labels, clustered = fit_final(name, X, ref, k)
+            profile, prop = cluster_profile(name, X, clustered)
 
 
 if __name__ == "__main__":
