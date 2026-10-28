@@ -490,6 +490,20 @@ def churn_crosstab(name: str, clustered: pd.DataFrame) -> None:
 
 
 # ---------------------------------------------------------------------------
+# STEP 10: TEE UNTUK LOG BUKTI EKSEKUSI
+# ---------------------------------------------------------------------------
+class Tee:
+    """Tulis stdout ke terminal sekaligus ke file log (bukti eksekusi)."""
+    def __init__(self, path: Path):
+        self.f = open(path, "w", encoding="utf-8")
+        self.o = sys.stdout
+    def write(self, s):
+        self.o.write(s); self.f.write(s)
+    def flush(self):
+        self.o.flush(); self.f.flush()
+
+
+# ---------------------------------------------------------------------------
 # MAIN (diperluas pada step berikutnya)
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -499,6 +513,7 @@ def main() -> None:
     args = parser.parse_args()
     ensure_dirs()
     names = list(DATASETS) if args.dataset == "all" else [args.dataset]
+    sys.stdout = Tee(EVID_DIR / f"run_log_{args.stage}_{args.dataset}.txt")
 
     if args.stage in ("elbow", "all"):
         for name in names:

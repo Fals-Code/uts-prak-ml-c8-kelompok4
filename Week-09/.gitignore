@@ -5,5 +5,6 @@ data/raw/*
 !data/raw/TELCO_SOURCE_LICENSE.txt
 data/processed/
 outputs/
+outputs_*/
 *.zip
 *.bundle
