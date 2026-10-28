@@ -145,16 +145,63 @@ def load_dataset(name: str):
 
 
 # ---------------------------------------------------------------------------
+# STEP 2: ELBOW (COST K-MODES)
+# ---------------------------------------------------------------------------
+def fit_kmodes(X: pd.DataFrame, k: int, n_init: int, init: str = INIT, seed: int = SEED):
+    """Fit K-Modes. Cao deterministik, jadi n_init dipaksa 1."""
+    if init == "Cao":
+        n_init = 1
+    km = KModes(n_clusters=k, init=init, n_init=n_init, max_iter=100,
+                random_state=seed, verbose=0)
+    labels = km.fit_predict(X.values)
+    return km, labels
+
+
+def run_elbow(name: str, X: pd.DataFrame):
+    """Hitung cost untuk setiap k. Kembalikan tabel cost dan label tiap k."""
+    rows, labels_by_k = [], {}
+    for k in K_RANGE:
+        km, labels = fit_kmodes(X, k, N_INIT_ELBOW)
+        rows.append({"k": k, "cost": float(km.cost_), "n_iter": int(km.n_iter_)})
+        labels_by_k[k] = labels
+        print(f"[{name}] k={k:2d}  cost={km.cost_:.1f}  n_iter={km.n_iter_}")
+    df = pd.DataFrame(rows)
+    df["cost_drop"] = -df["cost"].diff()
+    df["drop_pct"] = df["cost_drop"] / df["cost"].shift(1) * 100
+    df.to_csv(TABLE_DIR / f"{name}_cost_per_k.csv", index=False)
+    return df, labels_by_k
+
+
+def plot_elbow(name: str, cost_df: pd.DataFrame) -> None:
+    fig, ax = plt.subplots(figsize=(9, 5))
+    ax.plot(cost_df["k"], cost_df["cost"], "o-", alpha=0.8)
+    ax.set_xticks(cost_df["k"])
+    ax.set_xlabel("Jumlah cluster (k)")
+    ax.set_ylabel("Cost K-Modes")
+    ax.set_title(f"Metode Elbow K-Modes - {DATASETS[name]['title']}")
+    ax.grid(alpha=0.3)
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / f"{name}_elbow.png", dpi=150)
+    plt.close(fig)
+
+
+# ---------------------------------------------------------------------------
 # MAIN (diperluas pada step berikutnya)
 # ---------------------------------------------------------------------------
 def main() -> None:
     parser = argparse.ArgumentParser()
+    parser.add_argument("--stage", choices=["elbow", "final", "all"], default="all")
     parser.add_argument("--dataset", choices=["mall", "telco", "all"], default="all")
     args = parser.parse_args()
     ensure_dirs()
     names = list(DATASETS) if args.dataset == "all" else [args.dataset]
-    for name in names:
-        load_dataset(name)
+
+    if args.stage in ("elbow", "all"):
+        for name in names:
+            X, ref = load_dataset(name)
+            cost_df, labels_by_k = run_elbow(name, X)
+            plot_elbow(name, cost_df)
+            print(cost_df.round(2).to_string(index=False))
 
 
 if __name__ == "__main__":
