@@ -23,6 +23,7 @@ import pandas as pd
 import seaborn as sns
 from kmodes.kmodes import KModes
 from scipy.spatial.distance import pdist, squareform
+from scipy.stats import chi2_contingency
 from sklearn.metrics import adjusted_rand_score, silhouette_score
 
 # ---------------------------------------------------------------------------
@@ -452,6 +453,43 @@ def plot_stacked(name: str, X: pd.DataFrame, clustered: pd.DataFrame) -> None:
 
 
 # ---------------------------------------------------------------------------
+# STEP 9: CHURN SEBAGAI PEMBANDING (SETELAH CLUSTERING)
+# ---------------------------------------------------------------------------
+def churn_crosstab(name: str, clustered: pd.DataFrame) -> None:
+    check("Churn" in clustered.columns, "kolom Churn tidak ada")
+    counts = pd.crosstab(clustered["cluster"], clustered["Churn"])
+    pct = pd.crosstab(clustered["cluster"], clustered["Churn"], normalize="index") * 100
+    counts.to_csv(TABLE_DIR / f"{name}_churn_crosstab_counts.csv")
+    pct.round(2).to_csv(TABLE_DIR / f"{name}_churn_crosstab_pct.csv")
+
+    chi2, p, dof, _ = chi2_contingency(counts)
+    n = counts.to_numpy().sum()
+    cramers_v = math.sqrt(chi2 / (n * (min(counts.shape) - 1)))
+    overall = clustered["Churn"].eq("Yes").mean() * 100
+
+    print(f"\n[{name}] Crosstab cluster x Churn (jumlah):\n{counts.to_string()}")
+    print(f"\n[{name}] Persentase per cluster (%):\n{pct.round(2).to_string()}")
+    print(f"[{name}] Churn keseluruhan = {overall:.2f}% | chi2={chi2:.2f}, dof={dof}, "
+          f"p={p:.3g}, Cramer's V={cramers_v:.3f}")
+
+    fig, ax = plt.subplots(figsize=(7.5, 4.8))
+    rate = pct["Yes"] if "Yes" in pct.columns else pct.iloc[:, -1]
+    bars = ax.bar(rate.index.astype(str), rate.values, color=sns.color_palette("Set2", len(rate)))
+    ax.axhline(overall, color="red", linestyle="--", label=f"Rata-rata keseluruhan {overall:.1f}%")
+    for b, v in zip(bars, rate.values):
+        ax.text(b.get_x() + b.get_width() / 2, v, f"{v:.1f}%", ha="center", va="bottom", fontsize=9)
+    ax.set_xlabel("Cluster"); ax.set_ylabel("Churn = Yes (%)")
+    ax.set_title("Persentase Churn per cluster (pembanding, bukan fitur)")
+    ax.legend()
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / f"{name}_churn_by_cluster.png", dpi=150)
+    plt.close(fig)
+    pd.DataFrame([{"chi2": chi2, "dof": dof, "p_value": p, "cramers_v": cramers_v,
+                   "overall_churn_pct": overall}]).to_csv(
+        TABLE_DIR / f"{name}_churn_association.csv", index=False)
+
+
+# ---------------------------------------------------------------------------
 # MAIN (diperluas pada step berikutnya)
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -486,6 +524,8 @@ def main() -> None:
             plot_cluster_sizes(name, clustered)
             plot_heatmap(name, prop)
             plot_stacked(name, X, clustered)
+            if name == "telco":
+                churn_crosstab(name, clustered)
 
 
 if __name__ == "__main__":
