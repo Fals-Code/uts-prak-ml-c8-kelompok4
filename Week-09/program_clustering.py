@@ -278,6 +278,31 @@ def save_k_decision() -> None:
 
 
 # ---------------------------------------------------------------------------
+# STEP 5: K-MODES FINAL
+# ---------------------------------------------------------------------------
+def fit_final(name: str, X: pd.DataFrame, ref: pd.DataFrame, k: int):
+    """Fit final. Label diurutkan ulang: cluster 0 = terbesar, dst (agar stabil dibaca)."""
+    km, labels = fit_kmodes(X, k, N_INIT_FINAL)
+    counts = pd.Series(labels).value_counts()
+    order = [c for c, _ in sorted(counts.items(), key=lambda t: (-t[1], t[0]))]
+    remap = {old: new for new, old in enumerate(order)}
+    labels = np.array([remap[l] for l in labels])
+
+    centroids = pd.DataFrame(km.cluster_centroids_[order], columns=X.columns)
+    centroids.insert(0, "cluster", range(k))
+    centroids.to_csv(TABLE_DIR / f"{name}_centroids_modes.csv", index=False)
+
+    clustered = pd.concat([ref.reset_index(drop=True), X.reset_index(drop=True)], axis=1)
+    clustered["cluster"] = labels
+    clustered.to_csv(TABLE_DIR / f"{name}_clustered.csv", index=False)
+
+    print(f"[{name}] K-Modes final: k={k}, init={INIT}, n_init={N_INIT_FINAL}, "
+          f"seed={SEED}, cost={km.cost_:.1f}, n_iter={km.n_iter_}")
+    print(clustered["cluster"].value_counts().sort_index().to_string())
+    return km, labels, clustered
+
+
+# ---------------------------------------------------------------------------
 # MAIN (diperluas pada step berikutnya)
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -299,6 +324,13 @@ def main() -> None:
             print(f"[{name}] saran elbow (otomatis, bukan keputusan): k={suggest_k_elbow(cost_df)}")
             if len(X) > SIL_SAMPLE_SIZE:
                 print(f"[{name}] silhouette dihitung pada sampel acak {SIL_SAMPLE_SIZE} baris (seed={SEED})")
+
+    if args.stage in ("final", "all"):
+        save_k_decision()
+        for name in names:
+            X, ref = load_dataset(name)
+            k = require_k(name)
+            km, labels, clustered = fit_final(name, X, ref, k)
 
 
 if __name__ == "__main__":
