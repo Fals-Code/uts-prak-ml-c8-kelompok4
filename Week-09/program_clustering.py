@@ -186,6 +186,74 @@ def plot_elbow(name: str, cost_df: pd.DataFrame) -> None:
 
 
 # ---------------------------------------------------------------------------
+# STEP 3: SILHOUETTE DENGAN JARAK HAMMING (kategorikal)
+# ---------------------------------------------------------------------------
+def encode_codes(X: pd.DataFrame) -> np.ndarray:
+    """Ubah label kategori menjadi kode integer per kolom (hanya untuk menghitung jarak)."""
+    return np.column_stack([pd.factorize(X[c])[0] for c in X.columns])
+
+
+def sample_indices(n: int, size: int, seed: int = SEED) -> np.ndarray:
+    if n <= size:
+        return np.arange(n)
+    rng = np.random.default_rng(seed)
+    return np.sort(rng.choice(n, size=size, replace=False))
+
+
+def prepare_distance(X: pd.DataFrame):
+    """Matriks jarak Hamming (proporsi fitur yang berbeda). Pakai sampel bila data besar."""
+    idx = sample_indices(len(X), SIL_SAMPLE_SIZE)
+    D = squareform(pdist(encode_codes(X.iloc[idx]), metric="hamming"))
+    return idx, D
+
+
+def suggest_k_elbow(cost_df: pd.DataFrame) -> int:
+    """Saran k = titik terjauh dari garis lurus antara titik pertama dan terakhir (kneedle sederhana).
+    HANYA saran; keputusan akhir tetap manual."""
+    k = cost_df["k"].to_numpy(float)
+    c = cost_df["cost"].to_numpy(float)
+    kn = (k - k.min()) / (k.max() - k.min())
+    cn = (c - c.min()) / (c.max() - c.min())
+    x1, y1, x2, y2 = kn[0], cn[0], kn[-1], cn[-1]
+    dist = np.abs((x2 - x1) * (cn - y1) - (y2 - y1) * (kn - x1)) / math.hypot(x2 - x1, y2 - y1)
+    return int(k[int(np.argmax(dist))])
+
+
+def add_silhouette(name: str, X: pd.DataFrame, cost_df: pd.DataFrame, labels_by_k: dict):
+    idx, D = prepare_distance(X)
+    sil = []
+    for k in cost_df["k"]:
+        s = np.nan
+        if k >= 2:
+            lab = labels_by_k[int(k)][idx]
+            if len(np.unique(lab)) >= 2:
+                s = float(silhouette_score(D, lab, metric="precomputed"))
+        sil.append(s)
+    sel = cost_df.copy()
+    sel["silhouette_hamming"] = sil
+    sel["silhouette_sample_size"] = len(idx)
+    sel["elbow_suggestion"] = sel["k"] == suggest_k_elbow(cost_df)
+    sel.to_csv(TABLE_DIR / f"{name}_k_selection.csv", index=False)
+    return sel
+
+
+def plot_k_selection(name: str, sel: pd.DataFrame) -> None:
+    fig, axes = plt.subplots(1, 2, figsize=(14, 5))
+    axes[0].plot(sel["k"], sel["cost"], "o-")
+    axes[0].set_title("Cost K-Modes (elbow)")
+    axes[0].set_xlabel("k"); axes[0].set_ylabel("Cost")
+    axes[1].plot(sel["k"], sel["silhouette_hamming"], "s-", color="tab:orange")
+    axes[1].set_title("Silhouette (jarak Hamming)")
+    axes[1].set_xlabel("k"); axes[1].set_ylabel("Silhouette")
+    for ax in axes:
+        ax.set_xticks(sel["k"]); ax.grid(alpha=0.3)
+    fig.suptitle(f"Pemilihan jumlah cluster - {DATASETS[name]['title']}")
+    fig.tight_layout()
+    fig.savefig(FIG_DIR / f"{name}_k_selection.png", dpi=150)
+    plt.close(fig)
+
+
+# ---------------------------------------------------------------------------
 # MAIN (diperluas pada step berikutnya)
 # ---------------------------------------------------------------------------
 def main() -> None:
@@ -201,7 +269,12 @@ def main() -> None:
             X, ref = load_dataset(name)
             cost_df, labels_by_k = run_elbow(name, X)
             plot_elbow(name, cost_df)
-            print(cost_df.round(2).to_string(index=False))
+            sel = add_silhouette(name, X, cost_df, labels_by_k)
+            plot_k_selection(name, sel)
+            print(sel.round(4).to_string(index=False))
+            print(f"[{name}] saran elbow (otomatis, bukan keputusan): k={suggest_k_elbow(cost_df)}")
+            if len(X) > SIL_SAMPLE_SIZE:
+                print(f"[{name}] silhouette dihitung pada sampel acak {SIL_SAMPLE_SIZE} baris (seed={SEED})")
 
 
 if __name__ == "__main__":
