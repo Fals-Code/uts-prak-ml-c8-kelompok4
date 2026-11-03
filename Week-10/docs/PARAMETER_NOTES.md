@@ -50,3 +50,36 @@ Dokumen ini mencatat rasional empiris dan justifikasi pemilihan parameter cluste
 ## 3. Catatan Relevan Terhadap $m$ (Fuzzifier)
 - Ketika nilai $m$ dinaikkan ($m \ge 2.0$), tingkat kekaburan (*fuzziness*) antar batas klaster meningkat pesat, menyebabkan Partition Coefficient menurun (misal $PC < 0.5$ pada Mall) dan nilai Silhouette score menurun secara gradual.
 - Fuzzifier $m=1.25$ hingga $m=1.50$ memberikan kestabilan separasi geometri yang sangat kokoh untuk kedua dataset tanpa kehilangan sifat representasi keanggotaan derajat probabilitas fuzzy.
+
+---
+
+## 4. Tuning Hyperparameter DBSCAN (`eps` dan `min_samples`)
+
+### 4.1 Metodologi & K-Distance Diagnostics
+- Sesuai kaidah pustaka clustering berbasis densitas:
+  - Nilai $\text{min\_samples}$ diuji di sekitar $D+1$ dan $2D$, di mana $D=3$ untuk Mall Customer ($\text{min\_samples} \in \{4, 5, 6\}$) dan $D=4$ untuk Palmer Penguins ($\text{min\_samples} \in \{5, 6, 8\}$).
+  - Grafik k-nearest neighbor distance ($k=\text{min\_samples}$) menunjukkan titik tekukan (*elbow*) tajam pada rentang jarak $[0.40, 0.65]$ untuk Mall Customer dan $[0.55, 0.75]$ untuk Palmer Penguins.
+- **Kriteria Kelayakan:**
+  - Jumlah klaster non-noise $\ge 2$.
+  - Cakupan observasi valid non-noise ($\text{coverage}$) $\ge 70\%$ (noise tidak melebihi 30%).
+  - Silhouette Score non-noise tertinggi sebagai fungsi objektif utama.
+
+### 4.2 Hasil dan Justifikasi Parameter DBSCAN Terpilih
+
+#### A. Mall Customer
+- **Parameter Terpilih:** $\text{eps} = 0.45, \text{min\_samples} = 4$
+- **Rasional Pemilihan:**
+  - Menghasilkan Silhouette Score tertinggi: `0.493716` pada non-noise subset.
+  - Davies-Bouldin Index: `0.607155`.
+  - Membentuk 7 klaster non-noise dengan coverage $71.5\%$ (57 titik noise terdeteksi sebagai outlier belanja yang tidak lazim).
+  - Sebagai pembanding pada klaster yang lebih sedikit ($\ge 5$ klaster), kombinasi $\text{eps} = 0.55, \text{min\_samples} = 6$ juga memberikan Silhouette tinggi `0.483962` dengan coverage $72.5\%$.
+
+#### B. Palmer Penguins
+- **Parameter Terpilih:** $\text{eps} = 0.60, \text{min\_samples} = 6$
+- **Rasional Pemilihan:**
+  - Menghasilkan Silhouette Score tertinggi: `0.561290`.
+  - Davies-Bouldin Index: `0.664558` dan Calinski-Harabasz: `519.570108`.
+  - Coverage sangat tinggi: $89.18\%$ (hanya 37 titik noise dari 342 observasi).
+  - Membentuk 2 klaster densitas utama yang sangat tegas, konsisten dengan pemisahan morfometrik dua kelompok ukuran tubuh penguin di ruang Euclidean.
+
+
