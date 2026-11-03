@@ -1,0 +1,4 @@
+dataset,method,k,inertia,n_samples,n_evaluated,n_noise,coverage,n_clusters,silhouette,davies_bouldin,calinski_harabasz,ari,nmi,purity,partition_coefficient,partition_entropy,internal_na_reason,c,m,n_iter,eps,min_samples,noise_ratio
+mall,kmeans,6.0,133.86842085478852,200,200,0,1.0,6,0.42841677628925934,0.8253539040983219,135.10210365783408,,,,,,,,,,,,
+mall,fcm,,,200,200,0,1.0,6,0.42742814991580175,0.8277427938879608,135.10221697157,,,,0.9465635647786849,0.10384646660174796,,6.0,1.25,26.0,,,
+mall,dbscan,,,200,143,57,0.715,7,0.4937163412858231,0.6071548567636074,112.7988243068848,,,,,,,,,,0.45,4.0,0.285

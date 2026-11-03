@@ -1,0 +1,34 @@
+{
+  "mall": {
+    "kmeans": {
+      "k": 6,
+      "random_state": 42
+    },
+    "fcm": {
+      "c": 6,
+      "m": 1.25,
+      "random_state": 42
+    },
+    "dbscan": {
+      "eps": 0.45,
+      "min_samples": 4,
+      "metric": "euclidean"
+    }
+  },
+  "penguins": {
+    "kmeans": {
+      "k": 2,
+      "random_state": 42
+    },
+    "fcm": {
+      "c": 2,
+      "m": 1.25,
+      "random_state": 42
+    },
+    "dbscan": {
+      "eps": 0.6,
+      "min_samples": 6,
+      "metric": "euclidean"
+    }
+  }
+}

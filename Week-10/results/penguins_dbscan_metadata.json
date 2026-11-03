@@ -1,0 +1,56 @@
+{
+  "preprocessing": {
+    "dataset": "penguins",
+    "rows_before": 344,
+    "rows_after": 342,
+    "rows_removed": 2,
+    "removed_source_rows": [
+      3,
+      271
+    ],
+    "removal_reason": "missing at least one selected feature",
+    "features": [
+      "Culmen Length (mm)",
+      "Culmen Depth (mm)",
+      "Flipper Length (mm)",
+      "Body Mass (g)"
+    ],
+    "scaling": "StandardScaler",
+    "missing_before": {
+      "Culmen Length (mm)": 2,
+      "Culmen Depth (mm)": 2,
+      "Flipper Length (mm)": 2,
+      "Body Mass (g)": 2
+    },
+    "missing_policy": "complete-case",
+    "sha256": "144f623143c9360fd77322a4f86acb06dc198814dbd2669724c63e6457b907bd",
+    "scaler_mean": [
+      43.9219298245614,
+      17.151169590643274,
+      200.91520467836258,
+      4201.754385964912
+    ],
+    "scaler_scale": [
+      5.4515960231618195,
+      1.9719039187562524,
+      14.0411405685891,
+      800.781229238452
+    ]
+  },
+  "model_parameters": {
+    "eps": 0.6,
+    "min_samples": 6,
+    "metric": "euclidean"
+  },
+  "selected_eps": 0.6,
+  "selected_min_samples": 6,
+  "selection": "single specified eps and min_samples",
+  "versions": {
+    "python": "3.14.6",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2"
+  }
+}

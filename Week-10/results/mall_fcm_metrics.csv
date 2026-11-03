@@ -1,0 +1,2 @@
+dataset,method,c,m,n_iter,n_samples,n_evaluated,n_noise,coverage,n_clusters,silhouette,davies_bouldin,calinski_harabasz,ari,nmi,purity,partition_coefficient,partition_entropy,internal_na_reason
+mall,fcm,6,1.25,26,200,200,0,1.0,6,0.42742814991580175,0.8277427938879608,135.10221697157,,,,0.9465635647786849,0.10384646660174796,
