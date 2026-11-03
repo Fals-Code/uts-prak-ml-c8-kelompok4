@@ -1,0 +1,12 @@
+{
+  "python": "3.14.6",
+  "platform": "Windows-11-10.0.26200-SP0",
+  "implementation_notes": "Fuzzy C-Means diimplementasikan secara mandiri menggunakan NumPy dan SciPy untuk menjamin kompatibilitas murni dengan Python 3.14 dan NumPy 2.x tanpa dependensi scikit-fuzzy eksternal yang rapuh.",
+  "packages": {
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scipy": "1.18.1",
+    "scikit-learn": "1.9.1",
+    "matplotlib": "3.11.2"
+  }
+}
