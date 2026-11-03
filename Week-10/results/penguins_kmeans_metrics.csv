@@ -1,0 +1,2 @@
+dataset,method,k,inertia,n_samples,n_evaluated,n_noise,coverage,n_clusters,silhouette,davies_bouldin,calinski_harabasz,ari,nmi,purity,internal_na_reason
+penguins,kmeans,2,565.7076453796292,342,342,0,1.0,2,0.5315403219473027,0.7140635170019061,482.19146903675363,0.6550658711307666,0.7670768187137166,0.8011695906432749,

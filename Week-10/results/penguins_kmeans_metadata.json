@@ -1,0 +1,61 @@
+{
+  "preprocessing": {
+    "dataset": "penguins",
+    "rows_before": 344,
+    "rows_after": 342,
+    "rows_removed": 2,
+    "removed_source_rows": [
+      3,
+      339
+    ],
+    "removal_reason": "missing at least one selected feature",
+    "features": [
+      "Culmen Length (mm)",
+      "Culmen Depth (mm)",
+      "Flipper Length (mm)",
+      "Body Mass (g)"
+    ],
+    "scaling": "StandardScaler",
+    "missing_before": {
+      "Culmen Length (mm)": 2,
+      "Culmen Depth (mm)": 2,
+      "Flipper Length (mm)": 2,
+      "Body Mass (g)": 2
+    },
+    "missing_policy": "complete-case",
+    "sha256": "5ea908ae6fd5363b6d649f9eecdd63c010caaa389ee9498483e9ec30647dee2d",
+    "scaler_mean": [
+      43.9219298245614,
+      17.151169590643278,
+      200.91520467836258,
+      4201.754385964912
+    ],
+    "scaler_scale": [
+      5.4515960231618195,
+      1.9719039187562524,
+      14.0411405685891,
+      800.781229238452
+    ]
+  },
+  "model_parameters": {
+    "algorithm": "lloyd",
+    "copy_x": true,
+    "init": "k-means++",
+    "max_iter": 300,
+    "n_clusters": 2,
+    "n_init": 10,
+    "random_state": 42,
+    "tol": 0.0001,
+    "verbose": 0
+  },
+  "selected_k": 2,
+  "selection": "highest valid silhouette; exact tie chooses smaller k",
+  "versions": {
+    "python": "3.14.6",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2"
+  }
+}
