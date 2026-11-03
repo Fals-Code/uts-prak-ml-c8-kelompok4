@@ -1,0 +1,54 @@
+{
+  "preprocessing": {
+    "dataset": "mall",
+    "rows_before": 200,
+    "rows_after": 200,
+    "rows_removed": 0,
+    "removed_source_rows": [],
+    "removal_reason": null,
+    "features": [
+      "Age",
+      "Annual Income (k$)",
+      "Spending Score (1-100)"
+    ],
+    "scaling": "StandardScaler",
+    "missing_before": {
+      "Age": 0,
+      "Annual Income (k$)": 0,
+      "Spending Score (1-100)": 0
+    },
+    "missing_policy": "reject missing",
+    "sha256": "416a4f62a8f33841a16e1db5297f0e05d3b65b05e73632cedae58e739e1e1f77",
+    "scaler_mean": [
+      38.85,
+      60.56,
+      50.2
+    ],
+    "scaler_scale": [
+      13.934041050606963,
+      26.19897707926781,
+      25.7588819633151
+    ]
+  },
+  "model_parameters": {
+    "algorithm": "lloyd",
+    "copy_x": true,
+    "init": "k-means++",
+    "max_iter": 300,
+    "n_clusters": 6,
+    "n_init": 10,
+    "random_state": 42,
+    "tol": 0.0001,
+    "verbose": 0
+  },
+  "selected_k": 6,
+  "selection": "highest valid silhouette; exact tie chooses smaller k",
+  "versions": {
+    "python": "3.14.6",
+    "numpy": "2.5.3",
+    "pandas": "3.0.6",
+    "scikit-learn": "1.9.1",
+    "scipy": "1.18.1",
+    "matplotlib": "3.11.2"
+  }
+}
