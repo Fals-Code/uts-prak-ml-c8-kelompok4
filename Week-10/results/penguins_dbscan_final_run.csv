@@ -1,0 +1,2 @@
+dataset,method,eps,min_samples,noise_ratio,n_samples,n_evaluated,n_noise,coverage,n_clusters,silhouette,davies_bouldin,calinski_harabasz,ari,nmi,purity,partition_coefficient,partition_entropy,internal_na_reason
+penguins,dbscan,0.6,6,0.10818713450292397,342,305,37,0.8918128654970761,2,0.5612897406128671,0.6645581867086667,519.5701078612032,0.6811455089165492,0.7781934082946853,0.8163934426229508,,,
