@@ -3,3 +3,5 @@ __pycache__/
 data/raw/*.csv
 results/*_labels.csv
 results/*_clusters.png
+results/*_membership.csv
+figures/*_comparison_2d.png

@@ -21,14 +21,28 @@ from .evaluation import evaluate_clustering
 from .fcm import run_fcm
 from .dbscan_runner import run_dbscan
 
+# Dataset-specific final tuned hyperparameters for reproducible default execution
+DEFAULT_PARAMS = {
+    "mall": {
+        "kmeans": {"k_values": [6]},
+        "fcm": {"k_values": [6], "m": 1.25},
+        "dbscan": {"eps": 0.45, "min_samples": 4},
+    },
+    "penguins": {
+        "kmeans": {"k_values": [2]},
+        "fcm": {"k_values": [2], "m": 1.25},
+        "dbscan": {"eps": 0.60, "min_samples": 6},
+    },
+}
+
 
 def run_clustering(
     dataset_name,
     method="kmeans",
-    k_values=range(2, 11),
-    m=2.0,
-    eps=0.5,
-    min_samples=5,
+    k_values=None,
+    m=None,
+    eps=None,
+    min_samples=None,
     random_state=42,
     n_init=10,
     output_dir=None,
@@ -41,14 +55,14 @@ def run_clustering(
         'mall' or 'penguins'.
     method : str
         'kmeans', 'fcm', or 'dbscan'.
-    k_values : iterable of int, default=range(2, 11)
-        Cluster candidate counts for KMeans and FCM.
-    m : float, default=2.0
-        Fuzzifier exponent for FCM.
-    eps : float, default=0.5
-        Epsilon neighborhood distance for DBSCAN.
-    min_samples : int, default=5
-        Core point minimum sample count for DBSCAN.
+    k_values : iterable of int, optional
+        Cluster candidate counts for KMeans and FCM. If None, uses tuned default.
+    m : float, optional
+        Fuzzifier exponent for FCM. If None, uses tuned default (1.25).
+    eps : float, optional
+        Epsilon neighborhood distance for DBSCAN. If None, uses tuned default.
+    min_samples : int, optional
+        Core point minimum sample count for DBSCAN. If None, uses tuned default.
     random_state : int, default=42
         Seed for reproducibility.
     n_init : int, default=10
@@ -63,6 +77,17 @@ def run_clustering(
     """
     if method not in {"kmeans", "fcm", "dbscan"}:
         raise ValueError(f"Unknown method '{method}'; expected 'kmeans', 'fcm', or 'dbscan'")
+
+    # Resolve tuned parameter defaults if not explicitly provided
+    defaults = DEFAULT_PARAMS.get(dataset_name, {}).get(method, {})
+    if k_values is None:
+        k_values = defaults.get("k_values", range(2, 11))
+    if m is None:
+        m = defaults.get("m", 2.0)
+    if eps is None:
+        eps = defaults.get("eps", 0.5)
+    if min_samples is None:
+        min_samples = defaults.get("min_samples", 5)
 
     data = prepare_dataset(dataset_name)
 
@@ -150,7 +175,7 @@ def run_clustering(
         prefix = f"{dataset_name}_{method}"
 
         # 1. Search candidates CSV
-        search_file_name = f"{prefix}_k_search.csv" if method in {"kmeans", "fcm"} else f"{prefix}_search.csv"
+        search_file_name = f"{prefix}_k_search.csv" if method in {"kmeans", "fcm"} else f"{prefix}_final_run.csv"
         pd.DataFrame(rows).to_csv(out / search_file_name, index=False)
 
         # 2. Metrics CSV
@@ -194,14 +219,14 @@ def run_clustering(
         (out / f"{prefix}_metadata.json").write_text(json.dumps(metadata, indent=2, allow_nan=False), encoding="utf-8")
 
         # 6. Curves (for KMeans and FCM)
-        if method == "kmeans":
+        if method == "kmeans" and len(candidates) > 1:
             for metric, suffix, ylabel in [("inertia", "elbow", "Inertia"), ("silhouette", "silhouette", "Silhouette Score")]:
                 fig, ax = plt.subplots()
                 ax.plot(candidates, [r[metric] for r in rows], marker="o", label=metric)
                 ax.axvline(best["k"], linestyle="--", color="gray", label=f"Selected k={best['k']}")
                 ax.set(title=f"{dataset_name}: K-Means {suffix}", xlabel="k", ylabel=ylabel, xticks=candidates)
                 ax.legend(); fig.tight_layout(); fig.savefig(out / f"{prefix}_{suffix}.png", dpi=150); plt.close(fig)
-        elif method == "fcm":
+        elif method == "fcm" and len(candidates) > 1:
             for metric, suffix, ylabel in [("silhouette", "silhouette", "Silhouette Score"), ("partition_coefficient", "pc", "Partition Coefficient")]:
                 fig, ax = plt.subplots()
                 ax.plot(candidates, [r[metric] for r in rows], marker="o", label=metric)
@@ -238,11 +263,19 @@ def main():
     datasets = ["mall", "penguins"] if args.dataset == "all" else [args.dataset]
     methods = ["kmeans", "fcm", "dbscan"] if args.method == "all" else [args.method]
 
+    summary_rows = {}
     for d_name in datasets:
+        summary_rows[d_name] = []
         for m_name in methods:
             result = run_clustering(d_name, method=m_name, output_dir=args.output_dir)
+            summary_rows[d_name].append(result["metrics"])
             print(f"[{d_name.upper()} - {m_name.upper()}] Metrics:")
             print(json.dumps(result["metrics"], indent=2))
+
+        # Update metrics summary table
+        if args.output_dir is not None:
+            sum_df = pd.DataFrame(summary_rows[d_name])
+            sum_df.to_csv(args.output_dir / f"metrics_summary_{d_name}.csv", index=False)
 
 
 if __name__ == "__main__":
