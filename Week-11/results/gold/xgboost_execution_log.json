@@ -1,0 +1,161 @@
+{
+  "started_utc": "2026-11-09T16:16:05.698856+00:00",
+  "command": [
+    "C:\\Users\\falah\\.codex\\worktrees\\falah-week09-public\\uts-prak-ml-c8-kelompok4\\Week-11\\.venv\\Scripts\\python.exe",
+    "-B",
+    "-m",
+    "src.train_xgboost_gold"
+  ],
+  "events": [
+    "Training-only hyperparameter selection and descriptive CV complete.",
+    "Final test metrics calculated once per model/baseline; no retuning.",
+    "Pipeline saved/reloaded exactly; artifacts saved; existing files preserved."
+  ],
+  "protected_existing_file_sha256": {
+    "Week-11/README.md": "04133266164fdfad26c14f5f50d875b46ef51601cee5b39cfb9abc9dbb453011",
+    "Week-11/figures/xgboost_actual_vs_predicted.png": "f0a2da76eb62b52aaf0d73bb02e4bfa2a39fa8e1152a43faa2999fb016eeb902",
+    "Week-11/figures/xgboost_feature_importance.png": "628efbdf57e2d47d350d75d7daa318e231d5320d2d69fd16bd8885bc21aac2c8",
+    "Week-11/figures/xgboost_residuals.png": "09d962bc5bb56f07f2dea414d6fd10842ce3d23f8a2f4d708e321d65c28394bb",
+    "Week-11/models/xgboost_pipeline.joblib": "fe82491c0e79b9015ed0c4ebc4792732d36bac77a1102fd3c1a7db5ff6cdb980",
+    "Week-11/requirements.txt": "05b15f45396fe02d4eb38ff658671b1bc1f5e642674538ca32a7f7dfaf96aa3a",
+    "Week-11/results/split_manifest.json": "21632a011bd7b7f7ce1bbe99b7899a1b8914a06505ca5ef9ad8afec93c0bb8d1",
+    "Week-11/results/xgboost_cv_results.csv": "cff64919c04b5ff275a2dcaa3cf29a86829f51287c6abbc3fb6a0c2d204c76ad",
+    "Week-11/results/xgboost_execution_log.json": "6e8e7954e37ff8ee6773ba3bfdd9ec7c9385ee4fcdbb1eb2fbf5b91f1f6616f1",
+    "Week-11/results/xgboost_metadata.json": "4d9101718617364360448220ac14c00a270b0739383ec13093eac3e8e1a58d8b",
+    "Week-11/results/xgboost_metrics.csv": "491ed11882402929bcc67728271751517a0a7f791b3545d19980a0468ea3ebbd",
+    "Week-11/results/xgboost_metrics.json": "37d5412a087c0718ad5573072c5c8478fc8ca9c8a695cc6223bef29304ada372",
+    "Week-11/results/xgboost_test_predictions.csv": "85fd5ee5b87f71754aff6a89cd12f49e6a6735f67beb22400ad25422a4497bf2",
+    "Week-11/src/__init__.py": "4fc8fa0b9a692bc3bc8a81e1b55e76035c532278c5118347e369ff187a3f8d11",
+    "Week-11/src/data_pipeline.py": "3dbcb288e96703ea65b4d60a13a9ee2ab950f80ad6240429d1e5c33acc046406",
+    "Week-11/src/evaluation.py": "3ebe8a6d2a5208e86fb48126b1ffe5fcc968203673b0c1298290a8b0d5c73684",
+    "Week-11/src/train_xgboost.py": "a39fc65c3a645b6e0d95fb8af94b085a7998226693da2cd832aceaf736d1e156",
+    "Week-11/tests/test_data_pipeline.py": "643568ce319b6d76d915f747adb01992cc2b673d082956465846f0871461b4d7",
+    "Week-11/tests/test_evaluation.py": "47cb62d13e6fd6a9027e4849695f9d750e239b1e09fa27e1d2065f0d80340e1a",
+    "Week-11/tests/test_xgboost.py": "f7c9fc9f0627fbb2dc8fb428d67b4b55f77251febf72e6afd50d07cf6fe5e764",
+    "Week-11/data/raw/FINAL_USO.csv": "f1a366b4edfbdf074136727f3653058be6d91456e0128a462220797400ae6087",
+    "Week-11/src/gold_data_pipeline.py": "003b6d8c82de908bb8bf9708909f4f2c33f4696b85b7ae6bdd0d084c8825e679",
+    "Week-11/tests/test_gold_data_pipeline.py": "5d77741ec619a317d8d303f793cf732d038f4bdb6810f278d841036f35c74114",
+    "Week-11/docs/GOLD_MIGRATION_DESIGN.md": "f21e8c650354fb4c40ad1eb9b2119d4a9b6f6112f82fd0f47c0ae7c62d35a0f0",
+    "Week-11/results/gold/split_manifest.json": "b29db2bd9508edbf2202890d7fde9204589cd12440f8e87fba0dbe9538f4cdde"
+  },
+  "status": "COMPLETE",
+  "fit_counts": {
+    "search_candidates": 12,
+    "search_cv_fits": 60,
+    "selected_parameter_metric_cv_fits": 5,
+    "total_cv_fits": 65,
+    "final_refits": 1
+  },
+  "best_parameters": {
+    "model__subsample": 1.0,
+    "model__reg_lambda": 1,
+    "model__n_estimators": 100,
+    "model__max_depth": 2,
+    "model__learning_rate": 0.1,
+    "model__colsample_bytree": 0.8
+  },
+  "metrics": {
+    "xgboost_training": {
+      "MAE": 0.8474457689340252,
+      "MAPE": 0.6585975581737883,
+      "MSE": 1.395211869000153,
+      "RMSE": 1.1811908689962656,
+      "R2": 0.9961685818027597
+    },
+    "xgboost_cv": {
+      "fold_metrics": [
+        {
+          "MAE": 14.396091810099465,
+          "MAPE": 11.207270121885085,
+          "MSE": 337.97933922281777,
+          "RMSE": 18.384214403199767,
+          "R2": -0.5025060834082897
+        },
+        {
+          "MAE": 1.838535850241774,
+          "MAPE": 1.552979356178329,
+          "MSE": 8.235586191618902,
+          "RMSE": 2.869771104394722,
+          "R2": 0.5940624670827859
+        },
+        {
+          "MAE": 2.222597738629715,
+          "MAPE": 2.0248285936710575,
+          "MSE": 9.608291574911082,
+          "RMSE": 3.0997244353185787,
+          "R2": 0.5130672494846986
+        },
+        {
+          "MAE": 1.3213431565769547,
+          "MAPE": 1.1730846242638466,
+          "MSE": 2.935188750091942,
+          "RMSE": 1.7132392565231342,
+          "R2": 0.9643142891501766
+        },
+        {
+          "MAE": 0.7169867004211695,
+          "MAPE": 0.6102024884459096,
+          "MSE": 0.9357968642514063,
+          "RMSE": 0.9673659412297946,
+          "R2": 0.9459727438146112
+        }
+      ],
+      "mean": {
+        "MAE": 4.099111051193816,
+        "MAPE": 3.313673036888846,
+        "MSE": 71.93884052073822,
+        "RMSE": 5.406863028133199,
+        "R2": 0.5029821332247966
+      },
+      "std_ddof0": {
+        "MAE": 5.17327893702082,
+        "MAPE": 3.9739378187115912,
+        "MSE": 133.0591485466741,
+        "RMSE": 6.534881231953991,
+        "R2": 0.5345038689729268
+      },
+      "aggregation": "Unweighted mean/std of five validation-fold metrics, not pooled OOF."
+    },
+    "xgboost_testing": {
+      "MAE": 0.6367647372190244,
+      "MAPE": 0.5269210733445568,
+      "MSE": 0.6468053754531047,
+      "RMSE": 0.8042421124593667,
+      "R2": 0.9699917796417279
+    },
+    "persistence_testing": {
+      "MAE": 0.5672218654970766,
+      "MAPE": 0.4686592428984378,
+      "MSE": 0.5501778366769661,
+      "RMSE": 0.7417397364823904,
+      "R2": 0.9744747672394123
+    }
+  },
+  "warnings": [],
+  "artifact_sha256": {
+    "models/gold/xgboost_pipeline.joblib": "fe5f7a2cc001bc32ae336311c85730e404154ce13ecd1af1a66f3f3f0f3d8425",
+    "results/gold/xgboost_metrics.json": "e5f299d3faf58e6c230dcdfe90519ccf7e1fee7f743861b46fc6ed54669c2f74",
+    "results/gold/xgboost_metrics.csv": "89d66fe74fdaa180b0ea35423fdbd89c83dd863e87584b8ab8902be1116c5480",
+    "results/gold/xgboost_cv_results.csv": "97cb9240c30eb67f3347881db32922f354ce465ad963b540d848033583b239e1",
+    "results/gold/xgboost_metadata.json": "8f927233b2aaf4c051d60a326ec6e9004016a2be0a9727e8de3c3478d73720e8",
+    "results/gold/xgboost_test_predictions.csv": "3779250473b67e9d9146bcdd684f2da0c602d9bb8a8b39b8bcf94c2ef508edbb",
+    "figures/gold/xgboost_actual_vs_predicted.png": "e2cd0192c96f27f11c1dc01025d9611409811f60e194840146f6d6fa9d6dde4f",
+    "figures/gold/xgboost_residuals.png": "c10edee2b2cbbb967a0f04ceaebe9c94675da37ea03f7aff3c6136740d02df58",
+    "figures/gold/xgboost_feature_importance.png": "56f2b21d5623cc271dade14df01f9b5c5a140079c5cd3423f0628a49d1858e09"
+  },
+  "existing_files_preserved": true,
+  "elapsed_seconds": 5.683698400000139,
+  "raw_summary_output": "{\n  \"best_parameters\": {\n    \"model__subsample\": 1.0,\n    \"model__reg_lambda\": 1,\n    \"model__n_estimators\": 100,\n    \"model__max_depth\": 2,\n    \"model__learning_rate\": 0.1,\n    \"model__colsample_bytree\": 0.8\n  },\n  \"best_mean_cv_rmse\": 5.406863028133199,\n  \"best_std_cv_rmse_ddof0\": 6.534881231953991,\n  \"best_fold_cv_rmse\": [\n    18.384214403199767,\n    2.869771104394722,\n    3.0997244353185787,\n    1.7132392565231342,\n    0.9673659412297946\n  ],\n  \"fit_counts\": {\n    \"search_candidates\": 12,\n    \"search_cv_fits\": 60,\n    \"selected_parameter_metric_cv_fits\": 5,\n    \"total_cv_fits\": 65,\n    \"final_refits\": 1\n  },\n  \"metrics\": {\n    \"xgboost_training\": {\n      \"MAE\": 0.8474457689340252,\n      \"MAPE\": 0.6585975581737883,\n      \"MSE\": 1.395211869000153,\n      \"RMSE\": 1.1811908689962656,\n      \"R2\": 0.9961685818027597\n    },\n    \"xgboost_cv\": {\n      \"fold_metrics\": [\n        {\n          \"MAE\": 14.396091810099465,\n          \"MAPE\": 11.207270121885085,\n          \"MSE\": 337.97933922281777,\n          \"RMSE\": 18.384214403199767,\n          \"R2\": -0.5025060834082897\n        },\n        {\n          \"MAE\": 1.838535850241774,\n          \"MAPE\": 1.552979356178329,\n          \"MSE\": 8.235586191618902,\n          \"RMSE\": 2.869771104394722,\n          \"R2\": 0.5940624670827859\n        },\n        {\n          \"MAE\": 2.222597738629715,\n          \"MAPE\": 2.0248285936710575,\n          \"MSE\": 9.608291574911082,\n          \"RMSE\": 3.0997244353185787,\n          \"R2\": 0.5130672494846986\n        },\n        {\n          \"MAE\": 1.3213431565769547,\n          \"MAPE\": 1.1730846242638466,\n          \"MSE\": 2.935188750091942,\n          \"RMSE\": 1.7132392565231342,\n          \"R2\": 0.9643142891501766\n        },\n        {\n          \"MAE\": 0.7169867004211695,\n          \"MAPE\": 0.6102024884459096,\n          \"MSE\": 0.9357968642514063,\n          \"RMSE\": 0.9673659412297946,\n          \"R2\": 0.9459727438146112\n        }\n      ],\n      \"mean\": {\n        \"MAE\": 4.099111051193816,\n        \"MAPE\": 3.313673036888846,\n        \"MSE\": 71.93884052073822,\n        \"RMSE\": 5.406863028133199,\n        \"R2\": 0.5029821332247966\n      },\n      \"std_ddof0\": {\n        \"MAE\": 5.17327893702082,\n        \"MAPE\": 3.9739378187115912,\n        \"MSE\": 133.0591485466741,\n        \"RMSE\": 6.534881231953991,\n        \"R2\": 0.5345038689729268\n      },\n      \"aggregation\": \"Unweighted mean/std of five validation-fold metrics, not pooled OOF.\"\n    },\n    \"xgboost_testing\": {\n      \"MAE\": 0.6367647372190244,\n      \"MAPE\": 0.5269210733445568,\n      \"MSE\": 0.6468053754531047,\n      \"RMSE\": 0.8042421124593667,\n      \"R2\": 0.9699917796417279\n    },\n    \"persistence_testing\": {\n      \"MAE\": 0.5672218654970766,\n      \"MAPE\": 0.4686592428984378,\n      \"MSE\": 0.5501778366769661,\n      \"RMSE\": 0.7417397364823904,\n      \"R2\": 0.9744747672394123\n    }\n  },\n  \"rmse_generalization_gap_test_minus_train\": -0.37694875653689885,\n  \"test_rmse_improvement_vs_persistence_percent\": -8.4264564648223,\n  \"model_sha256\": \"fe5f7a2cc001bc32ae336311c85730e404154ce13ecd1af1a66f3f3f0f3d8425\",\n  \"warnings\": []\n}",
+  "terminal_execution": {
+    "training": {
+      "command": "& './.venv/Scripts/python.exe' -B -m src.train_xgboost_gold",
+      "raw_output": "Gold search: 12 candidates x 5 folds = 60 fits, plus 1 training refit.\r\nSelected-parameter CV: 5 additional training-only fits for all metrics.\r\n{\r\n  \"best_parameters\": {\r\n    \"model__subsample\": 1.0,\r\n    \"model__reg_lambda\": 1,\r\n    \"model__n_estimators\": 100,\r\n    \"model__max_depth\": 2,\r\n    \"model__learning_rate\": 0.1,\r\n    \"model__colsample_bytree\": 0.8\r\n  },\r\n  \"best_mean_cv_rmse\": 5.406863028133199,\r\n  \"best_std_cv_rmse_ddof0\": 6.534881231953991,\r\n  \"best_fold_cv_rmse\": [\r\n    18.384214403199767,\r\n    2.869771104394722,\r\n    3.0997244353185787,\r\n    1.7132392565231342,\r\n    0.9673659412297946\r\n  ],\r\n  \"fit_counts\": {\r\n    \"search_candidates\": 12,\r\n    \"search_cv_fits\": 60,\r\n    \"selected_parameter_metric_cv_fits\": 5,\r\n    \"total_cv_fits\": 65,\r\n    \"final_refits\": 1\r\n  },\r\n  \"metrics\": {\r\n    \"xgboost_training\": {\r\n      \"MAE\": 0.8474457689340252,\r\n      \"MAPE\": 0.6585975581737883,\r\n      \"MSE\": 1.395211869000153,\r\n      \"RMSE\": 1.1811908689962656,\r\n      \"R2\": 0.9961685818027597\r\n    },\r\n    \"xgboost_cv\": {\r\n      \"fold_metrics\": [\r\n        {\r\n          \"MAE\": 14.396091810099465,\r\n          \"MAPE\": 11.207270121885085,\r\n          \"MSE\": 337.97933922281777,\r\n          \"RMSE\": 18.384214403199767,\r\n          \"R2\": -0.5025060834082897\r\n        },\r\n        {\r\n          \"MAE\": 1.838535850241774,\r\n          \"MAPE\": 1.552979356178329,\r\n          \"MSE\": 8.235586191618902,\r\n          \"RMSE\": 2.869771104394722,\r\n          \"R2\": 0.5940624670827859\r\n        },\r\n        {\r\n          \"MAE\": 2.222597738629715,\r\n          \"MAPE\": 2.0248285936710575,\r\n          \"MSE\": 9.608291574911082,\r\n          \"RMSE\": 3.0997244353185787,\r\n          \"R2\": 0.5130672494846986\r\n        },\r\n        {\r\n          \"MAE\": 1.3213431565769547,\r\n          \"MAPE\": 1.1730846242638466,\r\n          \"MSE\": 2.935188750091942,\r\n          \"RMSE\": 1.7132392565231342,\r\n          \"R2\": 0.9643142891501766\r\n        },\r\n        {\r\n          \"MAE\": 0.7169867004211695,\r\n          \"MAPE\": 0.6102024884459096,\r\n          \"MSE\": 0.9357968642514063,\r\n          \"RMSE\": 0.9673659412297946,\r\n          \"R2\": 0.9459727438146112\r\n        }\r\n      ],\r\n      \"mean\": {\r\n        \"MAE\": 4.099111051193816,\r\n        \"MAPE\": 3.313673036888846,\r\n        \"MSE\": 71.93884052073822,\r\n        \"RMSE\": 5.406863028133199,\r\n        \"R2\": 0.5029821332247966\r\n      },\r\n      \"std_ddof0\": {\r\n        \"MAE\": 5.17327893702082,\r\n        \"MAPE\": 3.9739378187115912,\r\n        \"MSE\": 133.0591485466741,\r\n        \"RMSE\": 6.534881231953991,\r\n        \"R2\": 0.5345038689729268\r\n      },\r\n      \"aggregation\": \"Unweighted mean/std of five validation-fold metrics, not pooled OOF.\"\r\n    },\r\n    \"xgboost_testing\": {\r\n      \"MAE\": 0.6367647372190244,\r\n      \"MAPE\": 0.5269210733445568,\r\n      \"MSE\": 0.6468053754531047,\r\n      \"RMSE\": 0.8042421124593667,\r\n      \"R2\": 0.9699917796417279\r\n    },\r\n    \"persistence_testing\": {\r\n      \"MAE\": 0.5672218654970766,\r\n      \"MAPE\": 0.4686592428984378,\r\n      \"MSE\": 0.5501778366769661,\r\n      \"RMSE\": 0.7417397364823904,\r\n      \"R2\": 0.9744747672394123\r\n    }\r\n  },\r\n  \"rmse_generalization_gap_test_minus_train\": -0.37694875653689885,\r\n  \"test_rmse_improvement_vs_persistence_percent\": -8.4264564648223,\r\n  \"model_sha256\": \"fe5f7a2cc001bc32ae336311c85730e404154ce13ecd1af1a66f3f3f0f3d8425\",\r\n  \"warnings\": []\r\n}\r\nReload equality: PASS; dataset/manifest/Penguins preservation: PASS.\r\n",
+      "exit_code": 0
+    },
+    "final_tests": {
+      "command": "& './.venv/Scripts/python.exe' -B -m pytest tests/test_gold_data_pipeline.py tests/test_xgboost_gold.py tests/test_data_pipeline.py tests/test_evaluation.py -v -p no:cacheprovider",
+      "raw_output": "============================= test session starts =============================\r\nplatform win32 -- Python 3.14.7, pytest-9.2.0, pluggy-1.7.0 -- C:\\Users\\falah\\.codex\\worktrees\\falah-week09-public\\uts-prak-ml-c8-kelompok4\\Week-11\\.venv\\Scripts\\python.exe\r\nrootdir: C:\\Users\\falah\\.codex\\worktrees\\falah-week09-public\\uts-prak-ml-c8-kelompok4\\Week-11\r\nplugins: anyio-4.16.0\r\ncollecting ... collected 62 items\r\n\r\ntests/test_gold_data_pipeline.py::test_hash_validation PASSED            [  1%]\r\ntests/test_gold_data_pipeline.py::test_required_columns PASSED           [  3%]\r\ntests/test_gold_data_pipeline.py::test_invalid_dates[invalid] PASSED     [  4%]\r\ntests/test_gold_data_pipeline.py::test_invalid_dates[duplicate] PASSED   [  6%]\r\ntests/test_gold_data_pipeline.py::test_invalid_dates[unsorted] PASSED    [  8%]\r\ntests/test_gold_data_pipeline.py::test_invalid_dates[wrong_format] PASSED [  9%]\r\ntests/test_gold_data_pipeline.py::test_numeric_validation[Adj Close-nan] PASSED [ 11%]\r\ntests/test_gold_data_pipeline.py::test_numeric_validation[High-inf] PASSED [ 12%]\r\ntests/test_gold_data_pipeline.py::test_numeric_validation[Close-0] PASSED [ 14%]\r\ntests/test_gold_data_pipeline.py::test_numeric_validation[Adj Close-bad] PASSED [ 16%]\r\ntests/test_gold_data_pipeline.py::test_next_observation_alignment PASSED [ 17%]\r\ntests/test_gold_data_pipeline.py::test_future_changes_cannot_change_predictors PASSED [ 19%]\r\ntests/test_gold_data_pipeline.py::test_historical_lags_rolling_returns PASSED [ 20%]\r\ntests/test_gold_data_pipeline.py::test_leading_history_and_terminal_exclusions PASSED [ 22%]\r\ntests/test_gold_data_pipeline.py::test_long_gap_excludes_only_pair PASSED [ 24%]\r\ntests/test_gold_data_pipeline.py::test_chronological_split_and_purge PASSED [ 25%]\r\ntests/test_gold_data_pipeline.py::test_cv_training_only_and_ordered PASSED [ 27%]\r\ntests/test_gold_data_pipeline.py::test_reproducibility_and_replay PASSED [ 29%]\r\ntests/test_gold_data_pipeline.py::test_manifest_tampering PASSED         [ 30%]\r\ntests/test_gold_data_pipeline.py::test_real_csv_unchanged PASSED         [ 32%]\r\ntests/test_gold_data_pipeline.py::test_penguins_files_unchanged PASSED   [ 33%]\r\ntests/test_xgboost_gold.py::test_dataset_and_manifest PASSED             [ 35%]\r\ntests/test_xgboost_gold.py::test_cv_training_only_and_gap PASSED         [ 37%]\r\ntests/test_xgboost_gold.py::test_bounded_search_and_unfitted_model PASSED [ 38%]\r\ntests/test_xgboost_gold.py::test_search_receives_only_explicit_training_inputs PASSED [ 40%]\r\ntests/test_xgboost_gold.py::test_metric_units_and_persistence PASSED     [ 41%]\r\ntests/test_xgboost_gold.py::test_fixture_pipeline_roundtrip PASSED       [ 43%]\r\ntests/test_xgboost_gold.py::test_prediction_frame_alignment_and_float_precision PASSED [ 45%]\r\ntests/test_xgboost_gold.py::test_penguins_artifacts_unchanged PASSED     [ 46%]\r\ntests/test_xgboost_gold.py::test_saved_gold_artifacts_readonly PASSED    [ 48%]\r\ntests/test_data_pipeline.py::test_bom_and_strip_headers PASSED           [ 50%]\r\ntests/test_data_pipeline.py::test_duplicate_normalized_header_rejected PASSED [ 51%]\r\ntests/test_data_pipeline.py::test_missing_required_column_rejected PASSED [ 53%]\r\ntests/test_data_pipeline.py::test_wrong_hash_rejected PASSED             [ 54%]\r\ntests/test_data_pipeline.py::test_missing_target_removed_without_imputation PASSED [ 56%]\r\ntests/test_data_pipeline.py::test_sex_normalized_and_rows_retained PASSED [ 58%]\r\ntests/test_data_pipeline.py::test_feature_allowlist_excludes_target_and_identifiers PASSED [ 59%]\r\ntests/test_data_pipeline.py::test_split_reproducible_disjoint_complete_and_aligned PASSED [ 61%]\r\ntests/test_data_pipeline.py::test_preprocessor_is_unfitted_and_fresh PASSED [ 62%]\r\ntests/test_data_pipeline.py::test_unknown_category_ignored_and_unknown_sex_encoded PASSED [ 64%]\r\ntests/test_data_pipeline.py::test_median_is_training_only_and_transform_does_not_refit PASSED [ 66%]\r\ntests/test_data_pipeline.py::test_manifest_replays_ordered_split PASSED  [ 67%]\r\ntests/test_data_pipeline.py::test_manifest_overlap_rejected PASSED       [ 69%]\r\ntests/test_data_pipeline.py::test_non_numeric_feature_rejected PASSED    [ 70%]\r\ntests/test_data_pipeline.py::test_all_missing_training_numeric_column_preserves_feature PASSED [ 72%]\r\ntests/test_evaluation.py::test_mae PASSED                                [ 74%]\r\ntests/test_evaluation.py::test_mape_percent PASSED                       [ 75%]\r\ntests/test_evaluation.py::test_mse PASSED                                [ 77%]\r\ntests/test_evaluation.py::test_rmse PASSED                               [ 79%]\r\ntests/test_evaluation.py::test_r2 PASSED                                 [ 80%]\r\ntests/test_evaluation.py::test_metric_schema PASSED                      [ 82%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true0-pred0] PASSED [ 83%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true1-pred1] PASSED [ 85%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true2-pred2] PASSED [ 87%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true3-pred3] PASSED [ 88%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true4-pred4] PASSED [ 90%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true5-pred5] PASSED [ 91%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true6-pred6] PASSED [ 93%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true7-pred7] PASSED [ 95%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true8-pred8] PASSED [ 96%]\r\ntests/test_evaluation.py::test_invalid_inputs_rejected[true9-pred9] PASSED [ 98%]\r\ntests/test_evaluation.py::test_perfect_prediction PASSED                 [100%]\r\n\r\n============================= 62 passed in 11.64s =============================\r\n",
+      "exit_code": 0
+    }
+  }
+}

@@ -17,7 +17,7 @@ def evaluate_regression(y_true, y_pred) -> dict[str, float]:
 
     MAPE = sklearn MAPE * 100. Zero targets are rejected, not silently clipped.
     R2 requires at least two observations and a nonconstant target here.
-    MAE/RMSE are in grams; MSE is in grams squared for the TM11 target.
+    MAE/RMSE use target price units; MSE uses squared price units. R2 is unitless.
     """
     try:
         true = np.asarray(y_true, dtype=float)

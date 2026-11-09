@@ -1,252 +1,203 @@
-# Week 11 — TM11 Regresi
+# Week 11 — Gold XGBoost Regression
 
-Kelompok 1 (ganjil), Kelas C8 — Praktikum Machine Learning, Universitas Airlangga.
-Algoritma tugas: XGBoost dan LightGBM. Target: memprediksi **Body Mass (g)**.
-Tahap 3A menyediakan data, preprocessing, dan split. Tahap 3B menambahkan evaluasi bersama dan eksperimen XGBoost; LightGBM belum diimplementasikan.
+Praktikum Machine Learning C8, Universitas Airlangga — Kelompok 1 (ganjil).
+Owner tahap Falah: Ahmad Mathlaul Falah (434241123).
+Urutan serah terima: Falah (data/XGBoost), Jamal (LightGBM), Azzam (perbandingan/UI/laporan).
 
-## Dataset dan integritas
+Solusi aktif Week-11 menggunakan Gold GLD ETF. Prototipe dataset sebelumnya
+tersimpan dalam Git history; implementasi dan artefaknya telah dipensiunkan
+dari working tree melalui commit migrasi biasa.
 
-Sumber lokal read-only: `../Week-10/data/raw/Penguins.csv` (Palmer Penguins).
-Dataset sekunder online yang disepakati kelas; bibliografi dan tautan sumber
-spesifik belum diverifikasi. File tidak disalin, dipindahkan, atau diubah.
+**XGBoost tidak mengungguli persistence pada final test set.**
+LightGBM dan UI belum diimplementasikan. Kesepakatan seluruh kelas atas
+dataset Gold belum diverifikasi; pemilihan ini adalah keputusan pengguna.
 
-SHA-256: `5ea908ae6fd5363b6d649f9eecdd63c010caaa389ee9498483e9ec30647dee2d`.
+## Dataset dan target
 
-Pembaca memverifikasi hash sebelum parsing, memakai `encoding="utf-8-sig"`,
-menormalisasi header dengan `strip()`, menolak duplikasi header setelah
-normalisasi, dan memvalidasi semua kolom wajib. Nilai numerik nonmissing yang
-tidak dapat dikonversi atau tidak finite menyebabkan error.
+Sumber resmi:
+https://www.kaggle.com/datasets/sid321axn/gold-price-prediction-dataset
 
-## Target dan fitur
+File lokal: data/raw/FINAL_USO.csv; 1718 baris, 81 kolom.
+Rentang tanggal asli: 2011-12-15 sampai 2018-12-31.
 
-Target: `Body Mass (g)`; target tidak pernah menjadi fitur.
-Urutan fitur selalu:
+SHA-256:
+f1a366b4edfbdf074136727f3653058be6d91456e0128a462220797400ae6087
 
-1. Culmen Length (mm)
-2. Culmen Depth (mm)
-3. Flipper Length (mm)
-4. Species
-5. Island
-6. Sex
+Ini harga **GLD ETF adjusted closing price dalam dataset price units**,
+bukan harga emas fisik per gram dan tidak diberi label rupiah.
+Detail currency, lisensi, dan point-in-time adjustment masih perlu konfirmasi.
 
-Hanya enam fitur tersebut yang dipilih. Identifier, komentar, tanggal,
-koordinat, isotop, dan metadata lainnya tidak digunakan. Indeks baris sumber
-dipertahankan sebagai index DataFrame, bukan sebagai kolom fitur.
+Pada akhir observasi t, prediksi Adj Close pada **next recorded observation t+1**.
+Cutoff fitur adalah akhir t. Close dan Adj Close identik dalam CSV, sehingga
+Close(t+1) membocorkan target; Close(t) sah digunakan untuk target berikutnya.
+Tanggal/indeks disimpan sebagai metadata, bukan fitur ordinal.
 
-## Kebijakan missing value dan preprocessing
+## Sebelas fitur historis
 
-- Target kosong: keluarkan baris dari supervised dataset, tanpa imputasi target.
-- Numerik: `SimpleImputer(strategy="median", keep_empty_features=True)`.
-  Median dipelajari hanya ketika pipeline di-fit pada fold training.
-- Kategorikal: strip string; string kosong menjadi missing. Sex dinormalisasi
-  uppercase; token titik juga menjadi missing. Missing diwakili `numpy.nan`
-  agar konsisten dengan scikit-learn.
-- Pipeline kategorikal: `SimpleImputer(strategy="constant",
-  fill_value="Unknown", keep_empty_features=True)`, lalu
-  `OneHotEncoder(handle_unknown="ignore", sparse_output=False)`.
-- Unknown bukan MALE/FEMALE. Kategori baru saat transform diabaikan encoder;
-  lebar fitur hasil transform tetap mengikuti vocabulary train.
-- Tidak memakai StandardScaler. `remainder="drop"` mempertahankan allowlist fitur.
-- Jika suatu fitur numerik seluruhnya kosong dalam fold training,
-  `keep_empty_features=True` mempertahankan kolom dengan fallback nol dari
-  SimpleImputer. Kondisi ini tidak ditemukan pada fitur numerik data valid aktual.
+| Fitur | Definisi |
+|---|---|
+| Open, High, Low, Close, Volume | Nilai saat t, tersedia pada cutoff akhir observasi |
+| close_lag_1, close_lag_5 | Close(t-1), Close(t-5) |
+| close_mean_prev_5 | Mean Close(t-5) sampai Close(t-1), min_periods=5 |
+| close_std_prev_5 | Sample std periode yang sama, ddof=1 |
+| close_return_1, close_return_5 | Close(t)/Close(t-k)-1, k=1 atau 5 |
 
-`make_preprocessor()` selalu mengembalikan transformer **belum fitted**.
-Pasang transformer itu pada Pipeline estimator nanti, sehingga setiap fold
-cross-validation melakukan fitting preprocessing sendiri. Jangan fit
-preprocessor pada seluruh dataset atau seluruh training sebelum tuning CV.
-Pada tahap ini, fitting transformer hanya dijalankan pada fixture unit test.
+Tidak ada centered rolling, future backfill, scaling, atau learned preprocessing.
+Data numerik nonfinite ditolak. Fitur eksternal tidak digunakan.
 
-## Split dan hasil eksekusi aktual
+## Gap policy, split, dan CV
 
-`train_test_split(test_size=0.20, random_state=42, shuffle=True)`.
+Pasangan source-target dengan gap lebih dari 6 hari kalender dikeluarkan:
+2013-04-15 ke 2013-05-01 dan 2013-12-13 ke 2014-01-02.
+Tidak ada observasi yang direkayasa. Lima baris awal belum memiliki histori
+cukup dan baris terakhir tidak memiliki target berikutnya.
 
-- Data asli: 344 baris × 19 kolom; BOM UTF-8.
-- Target valid: 342 baris; 2 baris target kosong dikeluarkan.
-- Training: 273 baris; testing: 69 baris (pembulatan ukuran test oleh scikit-learn).
-- Missing numerik awal: masing-masing 2 untuk tiga fitur numerik.
-  Setelah filtering target: masing-masing 0.
-- Sex awal: 10 kosong dan 1 titik. Setelah filtering target dan normalisasi:
-  9 Sex missing dipertahankan; akan diimputasi Unknown saat fitting pipeline.
-- Split disjoint, mencakup setiap baris eligible tepat sekali, dan urutan
-  indeks dapat direproduksi serta diputar ulang dari manifest.
-- SHA-256 split terurut:
-  `fd37f6636ccce38aa9f7f6b6ab9b3ccd53f269a0e83ad60e032efc471ee0b319`.
+1710 pasangan eligible dibagi tanpa shuffle:
+- Training: 1367; source 2011-12-22 sampai 2017-08-10.
+- Purge: satu source row 1374 (2017-08-11).
+- Testing: 342; source 2017-08-14 sampai 2018-12-28.
+- Training target terakhir 2017-08-11 mendahului first test cutoff 2017-08-14.
 
-Manifest: `results/split_manifest.json`. Berisi hash dataset, fitur/target,
-kebijakan missing, jumlah aktual, serta indeks train/test terurut.
-Indeks adalah posisi baris data CSV **zero-based, tidak menghitung header**.
-Tidak ada data mentah lengkap atau hasil model disimpan di manifest.
+Manifest: results/gold/split_manifest.json.
+Fingerprint:
+07224b5958086dc8c76fca249c26e960e7748cb21e70c94650ce8d9459f259f2
 
-Test set tidak digunakan untuk fitting preprocessing, tuning, pemilihan
-fitur, atau penyesuaian model. Hasil XGBoost tahap 3B tersedia pada bagian berikut.
+TimeSeriesSplit(n_splits=5, gap=1) hanya diterapkan pada training.
+Setiap fold memvalidasi urutan source/target dan batas informasi.
+Test set tidak masuk fitting, tuning, atau pemilihan fitur.
+Jumlah observasi per fold sama tidak berarti durasi kalender identik.
 
-## Cara menjalankan
+## Workflow XGBoost
 
-Jalankan dari folder Week-11 menggunakan environment khusus:
+Pipeline berisi XGBRegressor; tidak ada transformasi fitted tambahan.
+Parameter dasar: objective=reg:squarederror, random_state=42,
+tree_method=hist, device=cpu, n_jobs=1, importance_type=gain.
 
-```powershell
-& './.venv/Scripts/python.exe' -B -m src.data_pipeline
-& './.venv/Scripts/python.exe' -B -m pytest tests -v -p no:cacheprovider
-```
+RandomizedSearchCV: 12 kandidat, scoring=neg_root_mean_squared_error,
+random_state=42, n_jobs=1, refit=True, error_score=raise.
+Ruang pencarian:
+- n_estimators: [100, 200, 300]
+- max_depth: [2, 3, 4]
+- learning_rate: [0.03, 0.05, 0.1]
+- subsample: [0.8, 1.0]
+- colsample_bytree: [0.8, 1.0]
+- reg_lambda: [1, 5]
 
-Perintah pertama memverifikasi dataset, membuat split dan manifest, serta
-memeriksa reproducibility dan replay. Perintah itu tidak fit preprocessor
-atau model. Manifest dihasilkan deterministik tanpa timestamp.
-
-## Antarmuka serah terima
-
-Dari working directory Week-11:
-
-```python
-from src.data_pipeline import load_dataset, split_from_manifest, make_preprocessor
-
-dataset = load_dataset()
-split = split_from_manifest(dataset)
-preprocessor = make_preprocessor()  # belum fitted
-# split.X_train/X_test dan y_train/y_test masih dalam satuan asli.
-# Pasang preprocessor di dalam Pipeline model pada tahap berikutnya.
-```
-
-`load_dataset()` menghasilkan fitur terpilih dan target valid.
-`split_dataset()` membuat split baru dengan default yang disepakati.
-`split_from_manifest()` memakai indeks tersimpan tanpa resplit dan memvalidasi
-hash dataset, skema, cakupan/overlap indeks, jumlah, serta hash split.
-
-Unit test menggunakan fixture sintetis kecil untuk memeriksa perilaku
-fungsi, bukan sebagai hasil eksperimen penelitian. Eksekusi tahap 3A:
-**15 test lulus** pada tahap 3A. Hasil metrik, tuning, dan model XGBoost tahap 3B dijelaskan di bawah.
-
-## Keterbatasan
-
-Random row split berpotensi memasukkan observasi individu yang berkorelasi
-ke train dan test jika identifier penguin ternyata merepresentasikan individu
-berulang. Risiko tersebut belum dibuktikan; perlu analisis identitas tambahan.
-Pemeriksaan tahap ini tidak mengklaim seluruh bentuk leakage sudah dieliminasi.
-
-[Kembali ke halaman utama](../README.md)
-
-## Eksperimen XGBoost — Tahap 3B
-
-Pipeline bersama: preprocessing dari `make_preprocessor()`, kemudian
-`XGBRegressor(objective="reg:squarederror", random_state=42, n_jobs=1,
-tree_method="hist", importance_type="gain")`. Tidak ada perubahan fitur,
-dataset, preprocessor bersama, atau manifest tahap 3A.
-
-### Prosedur training dan seleksi
-
-- Replay split dari manifest: 273 training dan 69 testing, tanpa resplit.
-- RandomizedSearchCV: 12 kandidat, random_state=42, n_jobs=1, refit=True,
-  error_score="raise", scoring="neg_root_mean_squared_error".
-- KFold: 5 fold, shuffle=True, random_state=42.
-- Ruang pencarian: n_estimators=[100,200], max_depth=[2,3,4],
-  learning_rate=[0.05,0.10], subsample=[0.8,1.0],
-  colsample_bytree=[0.8,1.0], reg_lambda=[1.0,5.0].
-  Seluruh parameter search memakai prefix `model__`.
-- Preprocessing berada di dalam Pipeline CV dan di-fit ulang pada setiap
-  fold training. Test set tidak masuk fitting, tuning, atau early stopping.
-- Semua 60 fit CV berhasil, diikuti satu refit kandidat terbaik pada training.
-- Test set dievaluasi final setelah pemilihan parameter. Tidak ada tuning
-  ulang berdasarkan hasil test.
+60 search CV fits, 5 fit CV deskriptif pada parameter terpilih, dan 1 refit final.
+Seluruh CV selesai sebelum final test. Tidak ada tuning ulang berdasarkan test.
 
 Best parameters aktual:
-
 ```json
 {
-  "model__subsample": 0.8,
-  "model__reg_lambda": 5.0,
+  "model__subsample": 1.0,
+  "model__reg_lambda": 1,
   "model__n_estimators": 100,
-  "model__max_depth": 3,
-  "model__learning_rate": 0.05,
+  "model__max_depth": 2,
+  "model__learning_rate": 0.1,
   "model__colsample_bytree": 0.8
 }
 ```
 
-Best mean CV RMSE: **307.90695043 g**; standar deviasi antar-fold: **24.93766525 g**.
+## Hasil aktual
 
-### Evaluasi bersama dan hasil aktual
-
-Fungsi `src.evaluation.evaluate_regression(y_true, y_pred)` digunakan bersama
-untuk XGBoost dan LightGBM nantinya. Keys: MAE, MAPE, MSE, RMSE, R2.
-
-- MAE: mean_absolute_error, satuan g.
-- MAPE: mean_absolute_percentage_error × 100, satuan persen (%).
-- MSE: mean_squared_error, satuan g².
-- RMSE: sqrt(MSE), satuan g.
-- R2: r2_score, tanpa satuan.
-- Input harus 1D numerik finite, panjang sama, minimal dua observasi.
-  NaN/inf, target nol (MAPE), dan target konstan (R2 tidak terdefinisi)
-  ditolak secara eksplisit.
-
-Angka berikut dibaca dari file eksperimen, ditampilkan dengan pembulatan:
-
-| Subset | MAE (g) | MAPE (%) | MSE (g²) | RMSE (g) | R² |
+| Model / subset | MAE | MAPE (%) | MSE | RMSE | R2 |
 |---|---:|---:|---:|---:|---:|
-| training | 180.73212855 | 4.42468981 | 53305.70636660 | 230.88028579 | 0.91590757 |
-| testing | 259.32660708 | 6.77916850 | 103505.60557528 | 321.72287077 | 0.84433330 |
+| XGBoost training | 0.847445769 | 0.658597558 | 1.395211869 | 1.181190869 | 0.996168582 |
+| XGBoost CV mean | 4.099111051 | 3.313673037 | 71.938840521 | 5.406863028 | 0.502982133 |
+| XGBoost testing | 0.636764737 | 0.526921073 | 0.646805375 | 0.804242112 | 0.969991780 |
+| Persistence testing | 0.567221865 | 0.468659243 | 0.550177837 | 0.741739736 | 0.974474767 |
 
-Nilai penuh tersedia dalam JSON/CSV. Ini hasil XGBoost saja, bukan keputusan
-model terbaik antaralgoritma. LightGBM merupakan pekerjaan Jamal selanjutnya.
-Estimasi test set kecil memiliki ketidakpastian; R² training lebih tinggi
-dari testing tidak menjadi alasan melakukan tuning ulang pada test.
+MAE/RMSE memakai dataset price units; MSE squared units; R2 unitless.
+MAPE = sklearn MAPE × 100. Input nol untuk target MAPE ditolak.
+CV adalah mean metrik per fold, bukan pooled out-of-fold.
 
-### Artefak dan grafik
+Persistence memprediksi target berikutnya dengan Close(t), pada test targets identik.
+Test RMSE XGBoost 8.426456% lebih tinggi daripada persistence.
+R2 tinggi saja tidak membuktikan nilai tambah forecasting.
 
-- `results/xgboost_metrics.json` dan `xgboost_metrics.csv`: metrik train/test.
-- `results/xgboost_cv_results.csv`: 12 kandidat beserta skor setiap fold.
-- `results/xgboost_metadata.json`: parameter, konfigurasi, versi, hash,
-  reproducibility, hasil, dan catatan koreksi serialisasi.
-- `results/xgboost_test_predictions.csv`: source_row, actual_g, predicted_g,
-  residual_g; urutan 69 indeks sama dengan manifest, tanpa identitas penguin.
-- `models/xgboost_pipeline.joblib`: seluruh fitted preprocessing dan estimator.
-- `figures/xgboost_actual_vs_predicted.png`: scatter test dan garis ideal y=x.
-- `figures/xgboost_residuals.png`: residual aktual − prediksi terhadap prediksi,
-  dengan garis nol.
-- `figures/xgboost_feature_importance.png`: importance gain untuk 12 fitur
-  hasil encoding, memakai nama fitur dari fitted preprocessor.
-  Importance adalah kontribusi prediktif, bukan bukti hubungan kausal.
+Best mean CV RMSE 5.406863028; std antar-fold 6.534881232.
+RMSE lima fold: 18.384214403, 2.869771104, 3.099724435, 1.713239257, 0.967365941.
+CV sensitif terhadap periode: 140/227 target validation fold pertama berada di
+luar rentang target training-nya. Ini petunjuk perubahan distribusi, bukan
+bukti penyebab tunggal. Belum ada perbandingan terhadap LightGBM.
 
-Ketiga PNG adalah grafik hasil program dari eksperimen nyata, bukan screenshot
-training/UI. Prediksi reload joblib sama persis dengan sebelum penyimpanan.
+## Environment, verifikasi, dan reproduksi
 
-Pemeriksaan awal roundtrip CSV menemukan pembulatan float32 pada kolom
-prediksi. Serialisasi diperbaiki dengan kolom float64 dan test regresi khusus.
-CSV diperbaiki dari model tersimpan tanpa retraining, retuning, atau
-penghitungan ulang metrik test. Model dan metrik tidak berubah.
+Gunakan Python 3.14.7 dan requirements.txt yang mem-pin dependency langsung.
+Dependency transitif tidak di-lock sepenuhnya; lintas platform tidak dijamin bitwise-identik.
 
-SHA-256 model tersimpan:
-
-`fe82491c0e79b9015ed0c4ebc4792732d36bac77a1102fd3c1a7db5ff6cdb980`
-
-### Menjalankan, memuat model, dan serah terima
-
-Dari folder Week-11:
-
+Dari folder Week-11, pada tahap yang mengizinkan setup:
 ```powershell
-& './.venv/Scripts/python.exe' -B -m src.train_xgboost
+& 'C:/Users/falah/AppData/Local/Programs/Python/Python314/python.exe' -m venv .venv
+& './.venv/Scripts/python.exe' -m pip install --only-binary=:all: -r requirements.txt
 & './.venv/Scripts/python.exe' -B -m pytest tests -v -p no:cacheprovider
+& './.venv/Scripts/python.exe' -B -m src.gold_data_pipeline
 ```
 
-Training menolak menimpa artefak yang sudah ada. Untuk reproduksi terpisah
-pada tahap yang mengizinkan eksperimen ulang, gunakan
-`--output-root results/reproduction`; seluruh output tetap di bawah Week-11.
-Reproduksi memakai manifest yang sama. Jangan menjalankan pencarian baru
-untuk memilih parameter berdasarkan hasil testing.
+Venv existing jangan ditimpa. Perintah data pipeline hanya menerima manifest
+existing jika isi rekonstruksinya identik; manifest berbeda ditolak.
 
-Memuat model tidak memerlukan training ulang:
+Training default menolak overwrite artefak yang sudah tersedia.
+Untuk reproduksi terpisah pada tahap yang mengizinkan training, gunakan
+namespace baru di dalam Week-11:
+```powershell
+& './.venv/Scripts/python.exe' -B -m src.train_xgboost_gold --help
+& './.venv/Scripts/python.exe' -B -m src.train_xgboost_gold --output-root results/reproduction
+```
+
+Perintah reproduksi training tidak dijalankan pada integrasi ini. Jangan
+memakai hasil test untuk mengganti parameter atau mengulang pemilihan model.
+Output baru berada di results/reproduction/{models,results,figures}/gold/.
+Namespace existing tidak ditimpa. Verifikasi parameter, split, dan metrik;
+perbedaan runtime/platform dapat memengaruhi byte model/timing.
+
+Atribut Git Week-11 mempertahankan byte raw dataset dan artefak hasil supaya
+hash tidak berubah hanya karena normalisasi newline saat checkout.
+
+## Artefak dan provenance
+
+- results/gold/split_manifest.json: split, exclusions, purge, dan fold boundaries.
+- results/gold/xgboost_metrics.json dan .csv: train/CV/test/persistence.
+- results/gold/xgboost_cv_results.csv: 12 kandidat dan skor fold.
+- results/gold/xgboost_metadata.json: konfigurasi, versi, hash, hasil, keterbatasan.
+- results/gold/xgboost_test_predictions.csv: source/target row dan tanggal, prediksi/residual.
+- results/gold/xgboost_execution_log.json: bukti eksekusi asli; dipertahankan.
+- results/gold/xgboost_training_source.py.txt: source trainer persis saat eksperimen.
+- models/gold/xgboost_pipeline.joblib: fitted pipeline Gold.
+- figures/gold/: actual vs predicted, residuals, dan normalized-gain importance.
+
+Model SHA-256:
+fe5f7a2cc001bc32ae336311c85730e404154ce13ecd1af1a66f3f3f0f3d8425
+
+Integrasi menambah routing output/reproduksi dan menyesuaikan guard preservasi
+ke proyek Gold-only; konfigurasi model dan hasil tidak berubah.
+trainer_source_sha256 dalam metadata merujuk arsip source eksperimen asli
+(.py.txt), bukan wrapper integrasi terbaru. Metadata/log tidak diregenerasi.
+Referensi file prototipe lama dalam log adalah bukti historis, bukan dependency aktif.
+
+## Handoff LightGBM
 
 ```python
 import joblib
-from src.data_pipeline import load_dataset, split_from_manifest
-
-split = split_from_manifest(load_dataset())
-pipeline = joblib.load("models/xgboost_pipeline.joblib")
-predictions = pipeline.predict(split.X_test)
+from src.gold_data_pipeline import replay_gold_manifest, make_time_series_cv, validate_cv_folds
+from src.evaluation import evaluate_regression
+split = replay_gold_manifest()
+cv = make_time_series_cv()
+fold_audit = validate_cv_folds(split)
+model = joblib.load("models/gold/xgboost_pipeline.joblib")
+predictions = model.predict(split.X_test)
 ```
 
-Jamal menggunakan `src/data_pipeline.py`, manifest yang sama, dan
-`src/evaluation.py`; preprocessing harus tetap di dalam Pipeline LightGBM CV.
-Model joblib dan hasil masih lokal/untracked; belum ada commit atau push.
-Seluruh **36 unit test** Week-11 lulus, termasuk 15 test preprocessing.
-Seed, single-thread CPU, dan versi library disimpan untuk reproduksi;
-identitas bitwise lintas platform tidak dijamin.
+Jamal menggunakan manifest, 11 fitur, metrik, persistence baseline, dan
+training-only CV yang sama. LightGBM belum selesai dan tidak dilatih di tahap ini.
+
+Dokumen detail: docs/GOLD_MIGRATION_DESIGN.md dan docs/GOLD_XGBOOST_RESULTS.md.
+
+## Keterbatasan
+
+- Next recorded observation bukan jaminan sesi bursa berikutnya.
+- Lag/rolling berbasis observasi dapat melintasi gap kalender.
+- Data berakhir pada 2018; tidak ada klaim performa pasar terkini.
+- Detail currency, lisensi, dan point-in-time adjusted prices belum terverifikasi.
+- Kesepakatan kelas atas Gold belum diverifikasi.
+- Importance adalah kontribusi prediktif, bukan bukti kausalitas.

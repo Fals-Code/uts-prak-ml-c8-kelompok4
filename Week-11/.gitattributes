@@ -1,0 +1,10 @@
+# Preserve audited raw/experiment bytes across Git checkouts.
+data/raw/FINAL_USO.csv -text whitespace=cr-at-eol
+results/gold/** -text whitespace=cr-at-eol
+models/gold/** -text
+figures/gold/** -text
+src/*.py text eol=lf
+tests/*.py text eol=lf
+*.md text eol=lf
+docs/*.md text eol=lf
+requirements.txt text eol=lf
