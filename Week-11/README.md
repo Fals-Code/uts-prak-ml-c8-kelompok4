@@ -9,7 +9,7 @@ tersimpan dalam Git history; implementasi dan artefaknya telah dipensiunkan
 dari working tree melalui commit migrasi biasa.
 
 **XGBoost tidak mengungguli persistence pada final test set.**
-LightGBM dan UI belum diimplementasikan. Kesepakatan seluruh kelas atas
+LightGBM diimplementasikan (Tahap 2); UI belum. Kesepakatan seluruh kelas atas
 dataset Gold belum diverifikasi; pemilihan ini adalah keputusan pengguna.
 
 ## Dataset dan target
@@ -98,6 +98,46 @@ Best parameters aktual:
 }
 ```
 
+## Workflow LightGBM
+
+Pipeline berisi LGBMRegressor; tidak ada transformasi fitted tambahan.
+Parameter dasar: objective=regression, random_state=42, n_jobs=1,
+deterministic=True, force_row_wise=True, subsample_freq=1,
+importance_type=gain, verbose=-1.
+
+RandomizedSearchCV: 12 kandidat, scoring=neg_root_mean_squared_error,
+random_state=42, n_jobs=1, refit=True, error_score=raise.
+Ruang pencarian:
+- n_estimators: [100, 200, 300]
+- learning_rate: [0.03, 0.05, 0.1]
+- num_leaves: [4, 8, 15]
+- max_depth: [-1, 3, 5]
+- min_child_samples: [10, 20, 40]
+- subsample: [0.8, 1.0]
+- colsample_bytree: [0.8, 1.0]
+- reg_lambda: [0.0, 1.0, 5.0]
+
+60 search CV fits, 5 fit CV deskriptif pada parameter terpilih, dan 1 refit final.
+Perintah eksperimen:
+```powershell
+& './.venv/Scripts/python.exe' -B -m src.train_lightgbm_gold
+```
+Artefak disimpan di `models/gold/lightgbm_pipeline.joblib`, `results/gold/lightgbm_*`, dan `figures/gold/lightgbm_*`.
+
+Best parameters aktual:
+```json
+{
+  "model__subsample": 1.0,
+  "model__reg_lambda": 5.0,
+  "model__num_leaves": 8,
+  "model__n_estimators": 200,
+  "model__min_child_samples": 10,
+  "model__max_depth": 3,
+  "model__learning_rate": 0.05,
+  "model__colsample_bytree": 1.0
+}
+```
+
 ## Hasil aktual
 
 | Model / subset | MAE | MAPE (%) | MSE | RMSE | R2 |
@@ -105,6 +145,9 @@ Best parameters aktual:
 | XGBoost training | 0.847445769 | 0.658597558 | 1.395211869 | 1.181190869 | 0.996168582 |
 | XGBoost CV mean | 4.099111051 | 3.313673037 | 71.938840521 | 5.406863028 | 0.502982133 |
 | XGBoost testing | 0.636764737 | 0.526921073 | 0.646805375 | 0.804242112 | 0.969991780 |
+| LightGBM training | 0.779815076 | 0.607158678 | 1.159619746 | 1.076856418 | 0.996815546 |
+| LightGBM CV mean | 4.181892029 | 3.377142843 | 75.841660087 | 5.509848611 | 0.483193606 |
+| LightGBM testing | 0.647531209 | 0.536290075 | 0.671981204 | 0.819744597 | 0.968823759 |
 | Persistence testing | 0.567221865 | 0.468659243 | 0.550177837 | 0.741739736 | 0.974474767 |
 
 MAE/RMSE memakai dataset price units; MSE squared units; R2 unitless.
@@ -112,14 +155,15 @@ MAPE = sklearn MAPE × 100. Input nol untuk target MAPE ditolak.
 CV adalah mean metrik per fold, bukan pooled out-of-fold.
 
 Persistence memprediksi target berikutnya dengan Close(t), pada test targets identik.
-Test RMSE XGBoost 8.426456% lebih tinggi daripada persistence.
+Test RMSE XGBoost 8.426456% lebih tinggi daripada persistence; Test RMSE LightGBM 10.516473% lebih tinggi daripada persistence.
 R2 tinggi saja tidak membuktikan nilai tambah forecasting.
 
-Best mean CV RMSE 5.406863028; std antar-fold 6.534881232.
-RMSE lima fold: 18.384214403, 2.869771104, 3.099724435, 1.713239257, 0.967365941.
+Best mean CV RMSE XGBoost 5.406863028 (std 6.534881232); Best mean CV RMSE LightGBM 5.509848611 (std 6.744125471).
+RMSE lima fold XGBoost: 18.384214403, 2.869771104, 3.099724435, 1.713239257, 0.967365941.
+RMSE lima fold LightGBM: 18.902082288, 2.851969883, 3.171376075, 1.690077427, 0.933737382.
 CV sensitif terhadap periode: 140/227 target validation fold pertama berada di
 luar rentang target training-nya. Ini petunjuk perubahan distribusi, bukan
-bukti penyebab tunggal. Belum ada perbandingan terhadap LightGBM.
+bukti penyebab tunggal. Perbandingan formal komparatif antara XGBoost dan LightGBM dilakukan pada Tahap 3 oleh Azzam.
 
 ## Environment, verifikasi, dan reproduksi
 
@@ -188,10 +232,10 @@ model = joblib.load("models/gold/xgboost_pipeline.joblib")
 predictions = model.predict(split.X_test)
 ```
 
-Jamal menggunakan manifest, 11 fitur, metrik, persistence baseline, dan
-training-only CV yang sama. LightGBM belum selesai dan tidak dilatih di tahap ini.
+Jamal telah menyelesaikan implementasi dan training LightGBM menggunakan manifest, 11 fitur, metrik, persistence baseline, dan
+training-only CV yang sama.
 
-Dokumen detail: docs/GOLD_MIGRATION_DESIGN.md dan docs/GOLD_XGBOOST_RESULTS.md.
+Dokumen detail: docs/GOLD_MIGRATION_DESIGN.md, docs/GOLD_XGBOOST_RESULTS.md, dan docs/GOLD_LIGHTGBM_RESULTS.md.
 
 ## Keterbatasan
 
