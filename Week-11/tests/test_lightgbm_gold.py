@@ -1,6 +1,7 @@
 """LightGBM trainer contract tests; no randomized tuning is run by unit tests."""
 import inspect
 from pathlib import Path
+import shutil
 import sys
 
 import joblib
@@ -12,7 +13,7 @@ from sklearn.utils.validation import check_is_fitted
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src import train_lightgbm_gold as trainer
-from src.gold_data_pipeline import FEATURES, replay_gold_manifest
+from src.gold_data_pipeline import FEATURES, WEEK_DIR, replay_gold_manifest
 
 
 def test_bounded_search_and_unfitted_model():
@@ -82,3 +83,44 @@ def test_artifact_names_in_gold_namespace():
         filename = Path(name).name
         assert filename.startswith("lightgbm_")
 
+
+def test_default_run_refuses_overwriting_without_training(monkeypatch):
+    def fail(*args, **kwargs):
+        raise AssertionError("Training must not be reached")
+
+    monkeypatch.setattr(trainer, "fit_training_search", fail)
+
+    temp_root = WEEK_DIR / "results" / "_pytest_lgbm"
+    dummy_file = temp_root / trainer.ARTIFACTS[0]
+    dummy_file.parent.mkdir(parents=True, exist_ok=True)
+    dummy_file.write_text("dummy", encoding="utf-8")
+    try:
+        with pytest.raises(FileExistsError):
+            trainer.run_gold_experiment(temp_root)
+    finally:
+        if temp_root.exists():
+            shutil.rmtree(temp_root)
+
+
+def test_output_namespace_must_remain_inside_week11():
+    with pytest.raises(ValueError, match="inside Week-11"):
+        trainer.run_gold_experiment(WEEK_DIR.parent)
+
+
+def test_trainer_does_not_reference_test_data_in_search():
+    source = inspect.getsource(trainer.fit_training_search)
+    assert "X_test" not in source
+    assert "y_test" not in source
+
+
+def test_importance_normalization():
+    raw = np.array([10.0, 30.0, 60.0])
+    normalized = trainer.normalize_gain(raw)
+    assert normalized.sum() == pytest.approx(1.0)
+    np.testing.assert_allclose(normalized, [0.1, 0.3, 0.6])
+
+    with pytest.raises(ValueError, match="positive and finite"):
+        trainer.normalize_gain(np.zeros(5))
+
+    with pytest.raises(ValueError, match="positive and finite"):
+        trainer.normalize_gain(np.array([-1.0, -2.0]))
