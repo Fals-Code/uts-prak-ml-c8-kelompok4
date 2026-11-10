@@ -1,10 +1,10 @@
 # Catatan Serah Terima (Handoff) Tahap 2: LightGBM — untuk Azzam
 
-**PIC Tahap 2:** Ah. Dliya'ul Adlha Jamalul Lail (434241126)  
-**Penerima (Tahap 3):** Azzam (Perbandingan Model, UI Streamlit, Laporan Final)  
-**Branch:** `adlha/week-11-lightgbm`  
-**Dataset:** Gold GLD ETF (`data/raw/FINAL_USO.csv`)  
-**Target Prediksi:** GLD ETF Adjusted Closing Price pada observasi tercatat berikutnya ($t+1$) dalam *dataset price units*.
+- **PIC Tahap 2:** Ah. Dliya'ul Adlha Jamalul Lail (434241126)
+- **Penerima (Tahap 3):** Azzam (Perbandingan Model, UI Streamlit, Laporan Final)
+- **Branch:** `adlha/week-11-lightgbm`
+- **Dataset:** Gold GLD ETF (`data/raw/FINAL_USO.csv`)
+- **Target Prediksi:** GLD ETF Adjusted Closing Price pada observasi tercatat berikutnya ($t+1$) dalam *dataset price units*.
 
 ---
 
