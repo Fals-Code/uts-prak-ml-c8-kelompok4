@@ -1,5 +1,6 @@
 """LightGBM trainer contract tests; no randomized tuning is run by unit tests."""
 import inspect
+import json
 from pathlib import Path
 import shutil
 import sys
@@ -13,7 +14,8 @@ from sklearn.utils.validation import check_is_fitted
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 from src import train_lightgbm_gold as trainer
-from src.gold_data_pipeline import FEATURES, WEEK_DIR, replay_gold_manifest
+from src.evaluation import evaluate_regression
+from src.gold_data_pipeline import FEATURES, MANIFEST_PATH, WEEK_DIR, replay_gold_manifest
 
 
 def test_bounded_search_and_unfitted_model():
@@ -124,3 +126,63 @@ def test_importance_normalization():
 
     with pytest.raises(ValueError, match="positive and finite"):
         trainer.normalize_gain(np.array([-1.0, -2.0]))
+
+
+def test_saved_gold_artifacts_readonly():
+    metadata_path = WEEK_DIR / "results/gold/lightgbm_metadata.json"
+    if not metadata_path.exists():
+        pytest.skip("Run the Gold LightGBM experiment before artifact integration audit")
+    metadata = json.loads(metadata_path.read_text(encoding="utf-8"))
+    metrics = json.loads((WEEK_DIR / "results/gold/lightgbm_metrics.json").read_text(encoding="utf-8"))
+    frame = pd.read_csv(WEEK_DIR / "results/gold/lightgbm_test_predictions.csv")
+    modelpath = WEEK_DIR / "models/gold/lightgbm_pipeline.joblib"
+
+    # 1. sha256(models/gold/lightgbm_pipeline.joblib) == metadata["model_sha256"]
+    assert trainer.sha256(modelpath) == metadata["model_sha256"]
+
+    # 2. metadata["split_fingerprint"] == EXPECTED_SPLIT; manifest_file_sha256 == sha256(MANIFEST_PATH); feature_schema == list(FEATURES)
+    assert metadata["split_fingerprint"] == trainer.EXPECTED_SPLIT
+    assert metadata["manifest_file_sha256"] == trainer.sha256(MANIFEST_PATH)
+    assert metadata["feature_schema"] == list(FEATURES)
+
+    # 3. sha256(results/gold/lightgbm_training_source.py.txt) == metadata["trainer_source_sha256"] dan byte sama dengan src/train_lightgbm_gold.py
+    source_archive = WEEK_DIR / "results/gold/lightgbm_training_source.py.txt"
+    trainer_file = WEEK_DIR / "src/train_lightgbm_gold.py"
+    assert trainer.sha256(source_archive) == metadata["trainer_source_sha256"]
+    assert source_archive.read_bytes() == trainer_file.read_bytes()
+
+    # 4. Prediksi CSV: 342 baris; source_row == split.test_indices; target_row cocok dengan timeline; semua numerik finite
+    split = replay_gold_manifest()
+    assert len(frame) == 342 and frame.source_row.tolist() == split.test_indices
+    assert frame.target_row.tolist() == split.samples.timeline.loc[split.test_indices, "target_row"].tolist()
+    assert np.isfinite(frame.select_dtypes(include="number").to_numpy()).all()
+
+    # 5. joblib.load(model).predict(split.X_test) ≈ lightgbm_prediction (atol=1e-10); residual = actual − prediksi; persistence_prediction == split.X_test.Close
+    loaded = joblib.load(modelpath)
+    np.testing.assert_allclose(loaded.predict(split.X_test), frame.lightgbm_prediction, rtol=0, atol=1e-10)
+    np.testing.assert_allclose(frame.lightgbm_residual, frame.actual - frame.lightgbm_prediction, rtol=0, atol=1e-10)
+    np.testing.assert_allclose(frame.persistence_prediction, split.X_test.Close, rtol=0, atol=1e-10)
+
+    # 6. loaded.get_params() cocok dengan metadata["best_parameters"]
+    for key, value in metadata["best_parameters"].items():
+        assert loaded.get_params()[key] == value
+
+    # 7. metrics.json == metadata["metrics"]; metrik yang dihitung ulang dari CSV prediksi dengan evaluate_regression = metrics["lightgbm_testing"] dan ["persistence_testing"]
+    assert metrics == metadata["metrics"]
+    recomputed_lgbm = evaluate_regression(frame.actual, frame.lightgbm_prediction)
+    recomputed_pers = evaluate_regression(frame.actual, frame.persistence_prediction)
+    assert recomputed_lgbm == pytest.approx(metrics["lightgbm_testing"])
+    assert recomputed_pers == pytest.approx(metrics["persistence_testing"])
+
+    # 8. cv_results.csv 12 baris, skor fold finite, -mean_test_score.max() == metadata["best_mean_cv_rmse"]
+    cv = pd.read_csv(WEEK_DIR / "results/gold/lightgbm_cv_results.csv")
+    assert len(cv) == 12
+    assert np.isfinite(cv[[f"split{i}_test_score" for i in range(5)]].to_numpy()).all()
+    assert float(-cv["mean_test_score"].max()) == pytest.approx(metadata["best_mean_cv_rmse"])
+
+    # 9. Target identik dengan XGBoost: lightgbm_test_predictions.csv dan xgboost_test_predictions.csv punya source_row, target_row, actual, dan persistence_prediction yang sama persis
+    xgb_frame = pd.read_csv(WEEK_DIR / "results/gold/xgboost_test_predictions.csv")
+    assert frame.source_row.tolist() == xgb_frame.source_row.tolist()
+    assert frame.target_row.tolist() == xgb_frame.target_row.tolist()
+    np.testing.assert_array_equal(frame.actual, xgb_frame.actual)
+    np.testing.assert_array_equal(frame.persistence_prediction, xgb_frame.persistence_prediction)
