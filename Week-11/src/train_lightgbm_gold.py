@@ -1,35 +1,18 @@
 """Gold-specific LightGBM experiment; same split, CV, metrics, and baseline as XGBoost."""
 from __future__ import annotations
 
-import argparse
-from datetime import datetime, timezone
-from importlib.metadata import version
-import json
-from pathlib import Path
-import platform
-import subprocess
-import sys
-import time
-import warnings
-
-import joblib
-import matplotlib
-matplotlib.use("Agg")
-import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from lightgbm import LGBMRegressor
 from sklearn.model_selection import RandomizedSearchCV
 from sklearn.pipeline import Pipeline
 
-from .evaluation import evaluate_regression
-from .gold_data_pipeline import (
-    MANIFEST_PATH, WEEK_DIR, FEATURES, EXPECTED_SHA256,
-    replay_gold_manifest, make_time_series_cv, validate_cv_folds,
-)
-from .train_xgboost_gold import (          # helper bersama -> perilaku identik dengan XGBoost
-    SEED, EXPECTED_SPLIT, PRICE_UNIT, sha256,
-    persistence_predict, selected_model_cv, save_model,
+from .gold_data_pipeline import FEATURES, make_time_series_cv
+from .train_xgboost_gold import (
+    SEED,
+    persistence_predict,
+    save_model,
+    sha256,
 )
 
 SEARCH_SPACE = {                            # DIBEKUKAN sebelum run pertama (lihat Step 6)
